@@ -5,16 +5,7 @@ import java.util.Scanner;
 
 public class HitungPenghasilanKaryawan {
 
-    // =========================================================================
-    // KONSTANTA GAJI POKOK BERDASARKAN GOLONGAN
-    // =========================================================================
-    public static final double GAJI_POKOK_GOLONGAN_A = 5_000_000.0;
-    public static final double GAJI_POKOK_GOLONGAN_B = 6_500_000.0;
-    public static final double GAJI_POKOK_GOLONGAN_C = 9_500_000.0;
-
-    // =========================================================================
-    // KONSTANTA PERSENTASE LEMBUR BERDASARKAN JAM KERJA LEMBUR
-    // =========================================================================
+    // PERSENTASE LEMBUR BERDASARKAN JAM KERJA LEMBUR
     public static final double PERSEN_LEMBUR_1_JAM = 0.30;
     public static final double PERSEN_LEMBUR_2_JAM = 0.32;
     public static final double PERSEN_LEMBUR_3_JAM = 0.34;
@@ -41,9 +32,7 @@ public class HitungPenghasilanKaryawan {
     }
 
     public static void jalankanPerhitungan(Scanner scanner) {
-        // -----------------------------------------------------------------
         // INPUT DATA
-        // -----------------------------------------------------------------
         System.out.print("Masukkan Golongan Karyawan (A/B/C): ");
         String inputGolongan = scanner.nextLine().trim();
 
@@ -52,16 +41,18 @@ public class HitungPenghasilanKaryawan {
             return;
         }
 
-        char golongan = inputGolongan.charAt(0);
+        char kodeGolongan = inputGolongan.charAt(0);
 
         // Tahap 1: Validasi dan Penentuan Gaji Pokok
-        double gajiPokok;
+        Golongan golongan;
         try {
-            gajiPokok = tentukanGajiPokok(golongan);
+            golongan = Golongan.fromChar(kodeGolongan);
         } catch (IllegalArgumentException e) {
             System.out.println("Error: Golongan tidak valid! Masukkan hanya golongan A, B, atau C.");
             return;
         }
+
+        double gajiPokok = golongan.getGajiPokok();
 
         System.out.print("Masukkan Jumlah Jam Lembur: ");
         String inputLembur = scanner.nextLine().trim();
@@ -87,24 +78,13 @@ public class HitungPenghasilanKaryawan {
 
         // Tahap 4: Menampilkan Rincian Hasil Perhitungan
         tampilkanRincianPenghasilan(
-                Character.toUpperCase(golongan),
+                golongan,
                 gajiPokok,
                 jamLembur,
                 persenLembur,
                 gajiLembur,
                 totalPenghasilan
         );
-    }
-
-    public static double tentukanGajiPokok(char golongan) {
-        char normalizedGolongan = Character.toUpperCase(golongan);
-
-        return switch (normalizedGolongan) {
-            case 'A' -> GAJI_POKOK_GOLONGAN_A;
-            case 'B' -> GAJI_POKOK_GOLONGAN_B;
-            case 'C' -> GAJI_POKOK_GOLONGAN_C;
-            default -> throw new IllegalArgumentException("Golongan tidak valid: " + golongan);
-        };
     }
 
     public static double tentukanPersenLembur(int jamLembur) {
@@ -141,7 +121,7 @@ public class HitungPenghasilanKaryawan {
     }
 
     public static void tampilkanRincianPenghasilan(
-            char golongan,
+            Golongan golongan,
             double gajiPokok,
             int jamLembur,
             double persenLembur,
@@ -153,7 +133,7 @@ public class HitungPenghasilanKaryawan {
         System.out.println("======================================");
         System.out.println("     RINCIAN PENGHASILAN KARYAWAN     ");
         System.out.println("======================================");
-        System.out.printf("Golongan Karyawan : %c%n", golongan);
+        System.out.printf("Golongan Karyawan : %s%n", golongan);
         System.out.printf("Gaji Pokok        : %s%n", formatRupiah(gajiPokok));
         System.out.printf("Durasi Lembur     : %d Jam%n", jamLembur);
         System.out.printf("Persentase Lembur : %d%%%n", persenDisplay);
