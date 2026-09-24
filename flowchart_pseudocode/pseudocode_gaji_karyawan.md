@@ -1,10 +1,4 @@
 # Pseudocode Perhitungan Penghasilan Karyawan
-**Mata Kuliah:** Algoritma dan Pemrograman  
-**Topik:** Percabangan Kondisional (Branching / Selection)
-
----
-
-## 1. Versi Standar Akademik Formal (Notasi Algoritmik)
 
 ```text
 PROGRAM HitungPenghasilanKaryawan
@@ -73,61 +67,7 @@ SELESAI
 
 ---
 
-## 2. Versi Alternatif (Menggunakan Konstruksi SWITCH - CASE)
-
-```text
-PROGRAM HitungPenghasilanKaryawan_SwitchCase
-
-DEKLARASI:
-    golongan        : character
-    jamLembur       : integer
-    gajiPokok       : real
-    persenLembur    : real
-    gajiLembur      : real
-    totalPenghasilan: real
-
-ALGORITMA:
-    INPUT(golongan, jamLembur)
-
-    // Seleksi Golongan
-    SWITCH (UPPERCASE(golongan)) DO
-        CASE 'A': gajiPokok <- 5000000
-        CASE 'B': gajiPokok <- 6500000
-        CASE 'C': gajiPokok <- 9500000
-        DEFAULT : 
-            OUTPUT("Golongan tidak valid!")
-            EXIT
-    ENDSWITCH
-
-    // Seleksi Jam Lembur
-    SWITCH (jamLembur) DO
-        CASE 1  : persenLembur <- 0.30
-        CASE 2  : persenLembur <- 0.32
-        CASE 3  : persenLembur <- 0.34
-        CASE 4  : persenLembur <- 0.36
-        DEFAULT :
-            IF (jamLembur >= 5) THEN
-                persenLembur <- 0.38
-            ELSE
-                persenLembur <- 0.0
-            ENDIF
-    ENDSWITCH
-
-    // Kalkulasi
-    gajiLembur <- persenLembur * gajiPokok
-    totalPenghasilan <- gajiPokok + gajiLembur
-
-    // Output
-    OUTPUT("Gaji Pokok        : Rp ", gajiPokok)
-    OUTPUT("Gaji Lembur       : Rp ", gajiLembur)
-    OUTPUT("Total Penghasilan : Rp ", totalPenghasilan)
-
-SELESAI
-```
-
----
-
-## 3. Tabel Uji Coba Logika (Trace Table / Dry Run)
+# Tabel Uji Coba Logika (Trace Table / Dry Run)
 
 | Kasus Uji | Input Golongan | Input Jam Lembur | Gaji Pokok | % Lembur | Hitungan Gaji Lembur | Total Penghasilan |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
