@@ -33,7 +33,7 @@ public class HitungPenghasilanKaryawan {
 
     public static void jalankanPerhitungan(Scanner scanner) {
         // INPUT DATA
-        System.out.print("Masukkan Golongan Karyawan (A/B/C): ");
+        System.out.print("Masukkan Golongan Karyawan (A/B/C/..): ");
         String inputGolongan = scanner.nextLine().trim();
 
         if (inputGolongan.isEmpty()) {
@@ -48,7 +48,7 @@ public class HitungPenghasilanKaryawan {
         try {
             golongan = Golongan.fromChar(kodeGolongan);
         } catch (IllegalArgumentException e) {
-            System.out.println("Error: Golongan tidak valid! Masukkan hanya golongan A, B, atau C.");
+            System.out.println("Error: Golongan tidak valid! Masukkan golongan yang benar.");
             return;
         }
 
