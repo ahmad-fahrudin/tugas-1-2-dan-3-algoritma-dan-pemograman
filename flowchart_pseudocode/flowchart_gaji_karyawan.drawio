@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Antigravity">
   <diagram id="flowchart-gaji" name="Flowchart Penghasilan Karyawan">
-    <mxGraphModel dx="1664" dy="996" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1700" math="0" shadow="0">
+    <mxGraphModel dx="1077" dy="484" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1700" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -55,22 +55,22 @@
         <mxCell id="e_in_gola" edge="1" parent="1" source="input" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="dec_gol_a">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_gola_ya" edge="1" parent="1" source="dec_gol_a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_gol_a" value="Ya">
+        <mxCell id="e_gola_ya" edge="1" parent="1" source="dec_gol_a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_gol_a" value="True">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_gola_tdk" edge="1" parent="1" source="dec_gol_a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="dec_gol_b" value="Tidak">
+        <mxCell id="e_gola_tdk" edge="1" parent="1" source="dec_gol_a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="dec_gol_b" value="False">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_golb_ya" edge="1" parent="1" source="dec_gol_b" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_gol_b" value="Ya">
+        <mxCell id="e_golb_ya" edge="1" parent="1" source="dec_gol_b" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_gol_b" value="True">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_golb_tdk" edge="1" parent="1" source="dec_gol_b" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="dec_gol_c" value="Tidak">
+        <mxCell id="e_golb_tdk" edge="1" parent="1" source="dec_gol_b" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="dec_gol_c" value="False">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_golc_ya" edge="1" parent="1" source="dec_gol_c" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_gol_c" value="Ya">
+        <mxCell id="e_golc_ya" edge="1" parent="1" source="dec_gol_c" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_gol_c" value="True">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_golc_tdk" edge="1" parent="1" source="dec_gol_c" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="err_gol" value="Tidak">
+        <mxCell id="e_golc_tdk" edge="1" parent="1" source="dec_gol_c" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="err_gol" value="False">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="e_proca_conn1" edge="1" parent="1" source="proc_gol_a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="conn1">
@@ -136,34 +136,34 @@
         <mxCell id="e_conn1_lem1" edge="1" parent="1" source="conn1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="dec_lem1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_lem1_ya" edge="1" parent="1" source="dec_lem1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_lem1" value="Ya">
+        <mxCell id="e_lem1_ya" edge="1" parent="1" source="dec_lem1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_lem1" value="True">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_lem1_tdk" edge="1" parent="1" source="dec_lem1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="dec_lem2" value="Tidak">
+        <mxCell id="e_lem1_tdk" edge="1" parent="1" source="dec_lem1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="dec_lem2" value="False">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_lem2_ya" edge="1" parent="1" source="dec_lem2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_lem2" value="Ya">
+        <mxCell id="e_lem2_ya" edge="1" parent="1" source="dec_lem2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_lem2" value="True">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_lem2_tdk" edge="1" parent="1" source="dec_lem2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="dec_lem3" value="Tidak">
+        <mxCell id="e_lem2_tdk" edge="1" parent="1" source="dec_lem2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="dec_lem3" value="False">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_lem3_ya" edge="1" parent="1" source="dec_lem3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_lem3" value="Ya">
+        <mxCell id="e_lem3_ya" edge="1" parent="1" source="dec_lem3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_lem3" value="True">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_lem3_tdk" edge="1" parent="1" source="dec_lem3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="dec_lem4" value="Tidak">
+        <mxCell id="e_lem3_tdk" edge="1" parent="1" source="dec_lem3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="dec_lem4" value="False">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_lem4_ya" edge="1" parent="1" source="dec_lem4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_lem4" value="Ya">
+        <mxCell id="e_lem4_ya" edge="1" parent="1" source="dec_lem4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_lem4" value="True">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="e_lem4_tdk" edge="1" parent="1" source="dec_lem4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="dec_lem5" value="Tidak">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_lem5_ya" edge="1" parent="1" source="dec_lem5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_lem5" value="Ya">
+        <mxCell id="e_lem5_ya" edge="1" parent="1" source="dec_lem5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_lem5" value="True">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_lem5_tdk" edge="1" parent="1" source="dec_lem5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_lem0" value="Tidak">
+        <mxCell id="e_lem5_tdk" edge="1" parent="1" source="dec_lem5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_lem0" value="False">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="e_lem0_conn2" edge="1" parent="1" source="proc_lem0" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="conn2">

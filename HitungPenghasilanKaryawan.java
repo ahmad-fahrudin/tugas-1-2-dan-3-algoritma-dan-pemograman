@@ -13,31 +13,68 @@ public class HitungPenghasilanKaryawan {
     public static final double PERSEN_LEMBUR_5_JAM_KEATAS = 0.38;
     public static final double PERSEN_LEMBUR_DEFAULT = 0.00;
 
+    // ANSI ESCAPE CODES UNTUK STYLING MODERN TERMINAL (HIGH CONTRAST OPENCODE STYLE)
+    public static final String RESET = "\u001B[0m";
+    public static final String BOLD = "\u001B[1m";
+
+    // Text Colors (High Contrast untuk Tema Gelap / Terang)
+    public static final String CYAN = "\u001B[36m";
+    public static final String BRIGHT_CYAN = "\u001B[96m";
+    public static final String BRIGHT_GREEN = "\u001B[92m";
+    public static final String BRIGHT_YELLOW = "\u001B[93m";
+    public static final String BRIGHT_RED = "\u001B[91m";
+    public static final String BRIGHT_WHITE = "\u001B[97m";
+    public static final String WHITE = "\u001B[37m";
+    public static final String BRIGHT_MAGENTA = "\u001B[95m";
+
+    // Lebar bagian dalam kartu UI
+    private static final int CARD_INNER_WIDTH = 56;
+
     public static void main(String[] args) {
         try (Scanner scanner = new Scanner(System.in)) {
             boolean lanjut = true;
 
+            tampilkanBanner();
+
             while (lanjut) {
                 jalankanPerhitungan(scanner);
 
-                System.out.print("\nApakah ingin menghitung gaji lagi? (y/n): ");
+                System.out.print("\n" + CYAN + "? " + RESET + BOLD + BRIGHT_WHITE + "Apakah ingin menghitung gaji lagi? " + RESET + BRIGHT_YELLOW + "(y/n) › " + RESET);
                 String pilihan = scanner.nextLine().trim();
                 if (pilihan.equalsIgnoreCase("n") || pilihan.equalsIgnoreCase("t")) {
                     lanjut = false;
-                    System.out.println("Program selesai. Terima kasih!");
+                    System.out.println("\n" + BRIGHT_GREEN + "✔ " + RESET + BOLD + BRIGHT_WHITE + "Program selesai. " + RESET + WHITE + "Terima kasih telah menggunakan program ini!\n" + RESET);
                 }
                 System.out.println();
             }
         }
     }
 
+    public static void tampilkanBanner() {
+        System.out.println();
+        System.out.println(CYAN + "╭" + "─".repeat(CARD_INNER_WIDTH) + "╮" + RESET);
+        System.out.println(CYAN + "│" + RESET + BOLD + BRIGHT_WHITE + "  ◈ SISTEM PERHITUNGAN PENGHASILAN KARYAWAN             " + RESET + CYAN + "│" + RESET);
+        System.out.println(CYAN + "│" + RESET + WHITE +              "    Tugas 1 • Algoritma dan Pemrograman                 " + RESET + CYAN + "│" + RESET);
+        System.out.println(CYAN + "╰" + "─".repeat(CARD_INNER_WIDTH) + "╯" + RESET);
+        System.out.println();
+    }
+
+    public static void tampilkanError(String pesan) {
+        System.out.println("\n" + BRIGHT_RED + BOLD + "  ✖ [ERROR] " + RESET + BRIGHT_RED + pesan + RESET + "\n");
+    }
+
     public static void jalankanPerhitungan(Scanner scanner) {
-        // INPUT DATA
-        System.out.print("Masukkan Golongan Karyawan (A/B/C/..): ");
+        // Form Input Header
+        System.out.println(CYAN + "╭─ [ FORM INPUT DATA ] " + "─".repeat(CARD_INNER_WIDTH - 22) + "╮" + RESET);
+        System.out.println(CYAN + "│" + RESET + WHITE + "  Silakan masukkan golongan dan jam lembur karyawan     " + RESET + CYAN + "│" + RESET);
+        System.out.println(CYAN + "╰" + "─".repeat(CARD_INNER_WIDTH) + "╯" + RESET);
+
+        // INPUT DATA GOLONGAN
+        System.out.print(CYAN + "  ➜ " + RESET + BRIGHT_WHITE + "Masukkan Golongan Karyawan " + RESET + BRIGHT_YELLOW + "(A / B / C)" + RESET + " : ");
         String inputGolongan = scanner.nextLine().trim();
 
         if (inputGolongan.isEmpty()) {
-            System.out.println("Error: Golongan tidak boleh kosong!");
+            tampilkanError("Golongan tidak boleh kosong!");
             return;
         }
 
@@ -48,24 +85,25 @@ public class HitungPenghasilanKaryawan {
         try {
             golongan = Golongan.fromChar(kodeGolongan);
         } catch (IllegalArgumentException e) {
-            System.out.println("Error: Golongan tidak valid! Masukkan golongan yang benar.");
+            tampilkanError("Golongan '" + kodeGolongan + "' tidak valid! Pilihan yang tersedia: A, B, atau C.");
             return;
         }
 
         double gajiPokok = golongan.getGajiPokok();
 
-        System.out.print("Masukkan Jumlah Jam Lembur: ");
+        // INPUT DATA JAM LEMBUR
+        System.out.print(CYAN + "  ➜ " + RESET + BRIGHT_WHITE + "Masukkan Jumlah Jam Lembur " + RESET + BRIGHT_YELLOW + "(jam)" + RESET + "        : ");
         String inputLembur = scanner.nextLine().trim();
         int jamLembur;
         try {
             jamLembur = Integer.parseInt(inputLembur);
         } catch (NumberFormatException e) {
-            System.out.println("Error: Jam lembur harus berupa bilangan bulat!");
+            tampilkanError("Jam lembur harus berupa bilangan bulat!");
             return;
         }
 
         if (jamLembur < 0) {
-            System.out.println("Error: Jam lembur tidak boleh bernilai negatif!");
+            tampilkanError("Jam lembur tidak boleh bernilai negatif!");
             return;
         }
 
@@ -120,6 +158,18 @@ public class HitungPenghasilanKaryawan {
         return formatter.format(nominal);
     }
 
+    private static String formatBarisKartu(String bullet, String label, String valueText, String valueColor) {
+        String prefix = String.format("   %s %-22s : ", bullet, label);
+        int sisaSpasi = CARD_INNER_WIDTH - prefix.length() - valueText.length();
+        String padding = " ".repeat(Math.max(0, sisaSpasi));
+
+        return CYAN + "│" + RESET +
+               BRIGHT_WHITE + prefix + RESET +
+               valueColor + valueText + RESET +
+               padding +
+               CYAN + "│" + RESET;
+    }
+
     public static void tampilkanRincianPenghasilan(
             Golongan golongan,
             double gajiPokok,
@@ -130,15 +180,18 @@ public class HitungPenghasilanKaryawan {
 
         int persenDisplay = (int) Math.round(persenLembur * 100);
 
-        System.out.println("======================================");
-        System.out.println("     RINCIAN PENGHASILAN KARYAWAN     ");
-        System.out.println("======================================");
-        System.out.printf("Golongan Karyawan : %s%n", golongan);
-        System.out.printf("Gaji Pokok        : %s%n", formatRupiah(gajiPokok));
-        System.out.printf("Durasi Lembur     : %d Jam%n", jamLembur);
-        System.out.printf("Persentase Lembur : %d%%%n", persenDisplay);
-        System.out.printf("Gaji Lembur       : %s%n", formatRupiah(gajiLembur));
-        System.out.printf("Total Penghasilan : %s%n", formatRupiah(totalPenghasilan));
-        System.out.println("======================================");
+        System.out.println();
+        System.out.println(CYAN + "╭" + "─".repeat(CARD_INNER_WIDTH) + "╮" + RESET);
+        System.out.println(CYAN + "│" + RESET + BOLD + BRIGHT_CYAN + "  RINCIAN PENGHASILAN KARYAWAN                          " + RESET + CYAN + "│" + RESET);
+        System.out.println(CYAN + "├" + "─".repeat(CARD_INNER_WIDTH) + "┤" + RESET);
+        System.out.println(formatBarisKartu("•", "Golongan Karyawan", "Golongan " + golongan, BRIGHT_CYAN + BOLD));
+        System.out.println(formatBarisKartu("•", "Gaji Pokok", formatRupiah(gajiPokok), BRIGHT_YELLOW));
+        System.out.println(formatBarisKartu("•", "Durasi Lembur", jamLembur + " Jam", BRIGHT_WHITE));
+        System.out.println(formatBarisKartu("•", "Persentase Lembur", persenDisplay + "%", BRIGHT_MAGENTA));
+        System.out.println(formatBarisKartu("•", "Nominal Gaji Lembur", formatRupiah(gajiLembur), BRIGHT_YELLOW));
+        System.out.println(CYAN + "├" + "─".repeat(CARD_INNER_WIDTH) + "┤" + RESET);
+        System.out.println(formatBarisKartu("★", "TOTAL PENGHASILAN", formatRupiah(totalPenghasilan), BRIGHT_GREEN + BOLD));
+        System.out.println(CYAN + "╰" + "─".repeat(CARD_INNER_WIDTH) + "╯" + RESET);
+        System.out.println(BRIGHT_GREEN + "  ✔ " + RESET + WHITE + "Perhitungan berhasil diselesaikan secara akurat." + RESET);
     }
 }
