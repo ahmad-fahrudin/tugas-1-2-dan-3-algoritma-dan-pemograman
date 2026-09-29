@@ -1,54 +1,56 @@
 # Pseudocode Perhitungan Penghasilan Karyawan
 
 ```text
-Algoritma HitungPenghasilanKaryawan
+Program HitungPenghasilanKaryawan
 { Menghitung total penghasilan bulanan karyawan berdasarkan gaji pokok golongan dan persentase uang lembur }
 
 DEKLARASI:
-    golongan : karakter
-    jamLembur : integer
-    gajiPokok, persenLembur, gajiLembur, totalPenghasilan : real
+    char golongan
+    int jamLembur
+    float gajiPokok, persenLembur, gajiLembur, totalPenghasilan
 
 ALGORITMA:
     // 1. Input Data
-    Input(golongan)
-    Input(jamLembur)
+    print("Masukkan Golongan Karyawan (A/B/C): ")
+    read(golongan)
+    print("Masukkan Jumlah Jam Lembur: ")
+    read(jamLembur)
 
     // 2. Tahap 1: Menentukan Gaji Pokok berdasarkan Golongan
-    jika (golongan = 'A' atau golongan = 'a') maka
+    if (golongan = 'A' or golongan = 'a') then
         gajiPokok <- 5000000
-    selain itu jika (golongan = 'B' atau golongan = 'b') maka
+    else if (golongan = 'B' or golongan = 'b') then
         gajiPokok <- 6500000
-    selain itu jika (golongan = 'C' atau golongan = 'c') maka
+    else if (golongan = 'C' or golongan = 'c') then
         gajiPokok <- 9500000
-    selain itu
-        Cetak "Error: Golongan tidak valid! Masukkan hanya golongan A, B, atau C."
-        Selesai
-    akhir-jika
+    else
+        print("Error: Golongan tidak valid! Masukkan hanya golongan A, B, atau C.")
+        exit
+    endif
 
     // 3. Tahap 2: Menentukan Persentase Lembur
-    jika (jamLembur = 1) maka
+    if (jamLembur = 1) then
         persenLembur <- 0.30
-    selain itu jika (jamLembur = 2) maka
+    else if (jamLembur = 2) then
         persenLembur <- 0.32
-    selain itu jika (jamLembur = 3) maka
+    else if (jamLembur = 3) then
         persenLembur <- 0.34
-    selain itu jika (jamLembur = 4) maka
+    else if (jamLembur = 4) then
         persenLembur <- 0.36
-    selain itu jika (jamLembur >= 5) maka
+    else if (jamLembur >= 5) then
         persenLembur <- 0.38
-    selain itu
+    else
         persenLembur <- 0.0
-    akhir-jika
+    endif
 
     // 4. Tahap 3: Perhitungan Gaji Lembur dan Total Penghasilan
     gajiLembur <- persenLembur * gajiPokok
     totalPenghasilan <- gajiPokok + gajiLembur
 
     // 5. Tahap 4: Menampilkan Output
-    Cetak "Gaji Pokok        : Rp ", gajiPokok
-    Cetak "Gaji Lembur       : Rp ", gajiLembur
-    Cetak "Total Penghasilan : Rp ", totalPenghasilan
+    print("Gaji Pokok        : Rp ", gajiPokok)
+    print("Gaji Lembur       : Rp ", gajiLembur)
+    print("Total Penghasilan : Rp ", totalPenghasilan)
 
-    Selesai
+end
 ```
