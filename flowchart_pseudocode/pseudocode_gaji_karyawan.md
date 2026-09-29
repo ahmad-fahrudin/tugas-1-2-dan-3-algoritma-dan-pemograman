@@ -1,24 +1,13 @@
 # Pseudocode Perhitungan Penghasilan Karyawan
 
 ```text
-================================================================================
-I. JUDUL
-================================================================================
-Kelas HitungPenghasilanKaryawan
-// Program untuk menghitung total penghasilan karyawan yang terdiri dari
-// Gaji Pokok (berdasarkan Golongan) dan Gaji Lembur (berdasarkan Jam Lembur).
+Program HitungPenghasilanKaryawan
 
-================================================================================
-II. DESKRIPSI (DEKLARASI)
-================================================================================
 // Deklarasi Variabel dan Tipe Data:
 char golongan
 int jamLembur
 float gajiPokok, persenLembur, gajiLembur, totalPenghasilan
 
-================================================================================
-III. IMPLEMENTASI (INTI DARI ALGORITMA)
-================================================================================
 1  Mulai
 2  // Inisialisasi nilai awal variabel:
 3  gajiPokok <- 0
