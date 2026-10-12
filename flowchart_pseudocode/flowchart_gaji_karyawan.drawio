@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Antigravity">
   <diagram id="flowchart-gaji" name="Flowchart Penghasilan Karyawan">
-    <mxGraphModel dx="1077" dy="484" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1700" math="0" shadow="0">
+    <mxGraphModel dx="1346" dy="629" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1850" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -11,46 +11,52 @@
           <mxGeometry height="330" width="260" x="40" y="115" as="geometry" />
         </mxCell>
         <mxCell id="group1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#cbd5e1;strokeWidth=1;dashed=1;dashPattern=6 6;arcSize=8;align=left;valign=top;spacingTop=8;spacingLeft=14;fontColor=#475569;fontStyle=1;fontSize=11;" value="" vertex="1">
-          <mxGeometry height="320" width="680" x="330" y="285" as="geometry" />
+          <mxGeometry height="320" width="680" x="330" y="400" as="geometry" />
         </mxCell>
         <mxCell id="group2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#cbd5e1;strokeWidth=1;dashed=1;dashPattern=6 6;arcSize=8;align=left;valign=top;spacingTop=8;spacingLeft=14;fontColor=#475569;fontStyle=1;fontSize=11;" value="" vertex="1">
-          <mxGeometry height="610" width="680" x="330" y="695" as="geometry" />
+          <mxGeometry height="610" width="680" x="330" y="810" as="geometry" />
         </mxCell>
         <mxCell id="group3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#cbd5e1;strokeWidth=1;dashed=1;dashPattern=6 6;arcSize=8;align=left;valign=top;spacingTop=8;spacingLeft=14;fontColor=#475569;fontStyle=1;fontSize=11;" value="" vertex="1">
-          <mxGeometry height="310" width="330" x="330" y="1370" as="geometry" />
+          <mxGeometry height="310" width="330" x="330" y="1485" as="geometry" />
         </mxCell>
         <mxCell id="start" parent="1" style="rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#10b981;strokeColor=#059669;fontColor=#ffffff;fontStyle=1;fontSize=13;shadow=1;" value="&lt;b&gt;MULAI&lt;/b&gt;" vertex="1">
           <mxGeometry height="45" width="140" x="420" y="115" as="geometry" />
         </mxCell>
-        <mxCell id="input" parent="1" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;arcSize=8;fillColor=#e0f2fe;strokeColor=#0284c7;strokeWidth=1.5;fontColor=#0369a1;fontSize=12;fontStyle=1;shadow=1;" value="&lt;b&gt;Input:&lt;/b&gt;&lt;br&gt;golongan, jamLembur" vertex="1">
-          <mxGeometry height="55" width="220" x="380" y="190" as="geometry" />
+        <mxCell id="decl" parent="1" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;size=20;fillColor=#ede9fe;strokeColor=#7c3aed;strokeWidth=1.5;fontColor=#4c1d95;fontSize=11;fontStyle=0;shadow=1;" value="&lt;b&gt;Deklarasi Variabel:&lt;/b&gt;&lt;br&gt;char golongan&lt;br&gt;int jamLembur&lt;br&gt;float gajiPokok, persenLembur,&lt;br&gt;gajiLembur, totalPenghasilan" vertex="1">
+          <mxGeometry height="85" width="310" x="335" y="190" as="geometry" />
         </mxCell>
-        <mxCell id="e_start_in" edge="1" parent="1" source="start" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="input">
+        <mxCell id="input" parent="1" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;arcSize=8;fillColor=#e0f2fe;strokeColor=#0284c7;strokeWidth=1.5;fontColor=#0369a1;fontSize=12;fontStyle=1;shadow=1;" value="&lt;b&gt;Input:&lt;/b&gt;&lt;br&gt;golongan, jamLembur" vertex="1">
+          <mxGeometry height="55" width="220" x="380" y="305" as="geometry" />
+        </mxCell>
+        <mxCell id="e_start_decl" edge="1" parent="1" source="start" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="decl">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="dec_gol_a" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#f59e0b;strokeWidth=1.5;fontColor=#92400e;fontStyle=1;fontSize=12;shadow=1;" value="golongan == &#39;A&#39;&amp;nbsp; or &#39;a&#39; ?" vertex="1">
-          <mxGeometry height="70" width="180" x="400" y="315" as="geometry" />
+        <mxCell id="e_decl_in" edge="1" parent="1" source="decl" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="input">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dec_gol_a" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#f59e0b;strokeWidth=1.5;fontColor=#92400e;fontStyle=1;fontSize=12;shadow=1;" value="golongan == &#39;A&#39; or &#39;a&#39; ?" vertex="1">
+          <mxGeometry height="70" width="180" x="400" y="430" as="geometry" />
         </mxCell>
         <mxCell id="proc_gol_a" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#eef2ff;strokeColor=#6366f1;strokeWidth=1.5;fontColor=#3730a3;fontStyle=1;fontSize=12;shadow=1;" value="gajiPokok = 5.000.000" vertex="1">
-          <mxGeometry height="55" width="210" x="680" y="322" as="geometry" />
+          <mxGeometry height="55" width="210" x="680" y="437" as="geometry" />
         </mxCell>
         <mxCell id="dec_gol_b" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#f59e0b;strokeWidth=1.5;fontColor=#92400e;fontStyle=1;fontSize=12;shadow=1;" value="golongan == &#39;B&#39; or &#39;b&#39; ?" vertex="1">
-          <mxGeometry height="70" width="180" x="400" y="415" as="geometry" />
+          <mxGeometry height="70" width="180" x="400" y="530" as="geometry" />
         </mxCell>
         <mxCell id="proc_gol_b" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#eef2ff;strokeColor=#6366f1;strokeWidth=1.5;fontColor=#3730a3;fontStyle=1;fontSize=12;shadow=1;" value="gajiPokok = 6.500.000" vertex="1">
-          <mxGeometry height="55" width="210" x="680" y="422" as="geometry" />
+          <mxGeometry height="55" width="210" x="680" y="537" as="geometry" />
         </mxCell>
         <mxCell id="dec_gol_c" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#f59e0b;strokeWidth=1.5;fontColor=#92400e;fontStyle=1;fontSize=12;shadow=1;" value="golongan == &#39;C&#39; or &#39;c&#39; ?" vertex="1">
-          <mxGeometry height="70" width="180" x="400" y="515" as="geometry" />
+          <mxGeometry height="70" width="180" x="400" y="630" as="geometry" />
         </mxCell>
         <mxCell id="proc_gol_c" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#eef2ff;strokeColor=#6366f1;strokeWidth=1.5;fontColor=#3730a3;fontStyle=1;fontSize=12;shadow=1;" value="gajiPokok = 9.500.000" vertex="1">
-          <mxGeometry height="55" width="210" x="680" y="522" as="geometry" />
+          <mxGeometry height="55" width="210" x="680" y="637" as="geometry" />
         </mxCell>
         <mxCell id="err_gol" parent="1" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;arcSize=8;fillColor=#ffe4e6;strokeColor=#f43f5e;strokeWidth=1.5;fontColor=#9f1239;fontSize=11;fontStyle=1;shadow=1;" value="&lt;b&gt;Output:&lt;/b&gt;&lt;br&gt;&amp;quot;Golongan Tidak Valid!&amp;quot;" vertex="1">
-          <mxGeometry height="55" width="180" x="100" y="522" as="geometry" />
+          <mxGeometry height="55" width="180" x="100" y="637" as="geometry" />
         </mxCell>
         <mxCell id="conn1" parent="1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#6366f1;strokeColor=#4338ca;fontColor=#ffffff;fontStyle=1;fontSize=11;shadow=1;" value="1" vertex="1">
-          <mxGeometry height="30" width="30" x="475" y="660" as="geometry" />
+          <mxGeometry height="30" width="30" x="475" y="775" as="geometry" />
         </mxCell>
         <mxCell id="e_in_gola" edge="1" parent="1" source="input" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="dec_gol_a">
           <mxGeometry relative="1" as="geometry" />
@@ -76,62 +82,62 @@
         <mxCell id="e_proca_conn1" edge="1" parent="1" source="proc_gol_a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="conn1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="940" y="350" />
-              <mxPoint x="940" y="630" />
+              <mxPoint x="940" y="465" />
+              <mxPoint x="940" y="745" />
             </Array>
           </mxGeometry>
         </mxCell>
         <mxCell id="e_procb_conn1" edge="1" parent="1" source="proc_gol_b" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="conn1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="940" y="450" />
-              <mxPoint x="940" y="630" />
+              <mxPoint x="940" y="565" />
+              <mxPoint x="940" y="745" />
             </Array>
           </mxGeometry>
         </mxCell>
         <mxCell id="e_procc_conn1" edge="1" parent="1" source="proc_gol_c" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="conn1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="940" y="550" />
-              <mxPoint x="940" y="630" />
+              <mxPoint x="940" y="665" />
+              <mxPoint x="940" y="745" />
             </Array>
           </mxGeometry>
         </mxCell>
         <mxCell id="dec_lem1" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#f59e0b;strokeWidth=1.5;fontColor=#92400e;fontStyle=1;fontSize=12;shadow=1;" value="jamLembur == 1 ?" vertex="1">
-          <mxGeometry height="65" width="180" x="400" y="720" as="geometry" />
+          <mxGeometry height="65" width="180" x="400" y="835" as="geometry" />
         </mxCell>
         <mxCell id="proc_lem1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#eef2ff;strokeColor=#6366f1;strokeWidth=1.5;fontColor=#3730a3;fontStyle=1;fontSize=12;shadow=1;" value="persenLembur = 0.30&lt;br&gt;(30%)" vertex="1">
-          <mxGeometry height="55" width="210" x="680" y="725" as="geometry" />
+          <mxGeometry height="55" width="210" x="680" y="840" as="geometry" />
         </mxCell>
         <mxCell id="dec_lem2" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#f59e0b;strokeWidth=1.5;fontColor=#92400e;fontStyle=1;fontSize=12;shadow=1;" value="jamLembur == 2 ?" vertex="1">
-          <mxGeometry height="65" width="180" x="400" y="815" as="geometry" />
+          <mxGeometry height="65" width="180" x="400" y="930" as="geometry" />
         </mxCell>
         <mxCell id="proc_lem2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#eef2ff;strokeColor=#6366f1;strokeWidth=1.5;fontColor=#3730a3;fontStyle=1;fontSize=12;shadow=1;" value="persenLembur = 0.32&lt;br&gt;(32%)" vertex="1">
-          <mxGeometry height="55" width="210" x="680" y="820" as="geometry" />
+          <mxGeometry height="55" width="210" x="680" y="935" as="geometry" />
         </mxCell>
         <mxCell id="dec_lem3" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#f59e0b;strokeWidth=1.5;fontColor=#92400e;fontStyle=1;fontSize=12;shadow=1;" value="jamLembur == 3 ?" vertex="1">
-          <mxGeometry height="65" width="180" x="400" y="910" as="geometry" />
+          <mxGeometry height="65" width="180" x="400" y="1025" as="geometry" />
         </mxCell>
         <mxCell id="proc_lem3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#eef2ff;strokeColor=#6366f1;strokeWidth=1.5;fontColor=#3730a3;fontStyle=1;fontSize=12;shadow=1;" value="persenLembur = 0.34&lt;br&gt;(34%)" vertex="1">
-          <mxGeometry height="55" width="210" x="680" y="915" as="geometry" />
+          <mxGeometry height="55" width="210" x="680" y="1030" as="geometry" />
         </mxCell>
         <mxCell id="dec_lem4" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#f59e0b;strokeWidth=1.5;fontColor=#92400e;fontStyle=1;fontSize=12;shadow=1;" value="jamLembur == 4 ?" vertex="1">
-          <mxGeometry height="65" width="180" x="400" y="1005" as="geometry" />
+          <mxGeometry height="65" width="180" x="400" y="1120" as="geometry" />
         </mxCell>
         <mxCell id="proc_lem4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#eef2ff;strokeColor=#6366f1;strokeWidth=1.5;fontColor=#3730a3;fontStyle=1;fontSize=12;shadow=1;" value="persenLembur = 0.36&lt;br&gt;(36%)" vertex="1">
-          <mxGeometry height="55" width="210" x="680" y="1010" as="geometry" />
+          <mxGeometry height="55" width="210" x="680" y="1125" as="geometry" />
         </mxCell>
         <mxCell id="dec_lem5" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#f59e0b;strokeWidth=1.5;fontColor=#92400e;fontStyle=1;fontSize=12;shadow=1;" value="jamLembur &amp;gt;= 5 ?" vertex="1">
-          <mxGeometry height="65" width="180" x="400" y="1100" as="geometry" />
+          <mxGeometry height="65" width="180" x="400" y="1215" as="geometry" />
         </mxCell>
         <mxCell id="proc_lem5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#eef2ff;strokeColor=#6366f1;strokeWidth=1.5;fontColor=#3730a3;fontStyle=1;fontSize=12;shadow=1;" value="persenLembur = 0.38&lt;br&gt;(38%)" vertex="1">
-          <mxGeometry height="55" width="210" x="680" y="1105" as="geometry" />
+          <mxGeometry height="55" width="210" x="680" y="1220" as="geometry" />
         </mxCell>
         <mxCell id="proc_lem0" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#eef2ff;strokeColor=#6366f1;strokeWidth=1.5;fontColor=#3730a3;fontStyle=1;fontSize=12;shadow=1;" value="persenLembur = 0.00&lt;br&gt;(Tidak Lembur)" vertex="1">
-          <mxGeometry height="55" width="180" x="400" y="1215" as="geometry" />
+          <mxGeometry height="55" width="180" x="400" y="1330" as="geometry" />
         </mxCell>
         <mxCell id="conn2" parent="1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#6366f1;strokeColor=#4338ca;fontColor=#ffffff;fontStyle=1;fontSize=11;shadow=1;" value="2" vertex="1">
-          <mxGeometry height="30" width="30" x="475" y="1330" as="geometry" />
+          <mxGeometry height="30" width="30" x="475" y="1445" as="geometry" />
         </mxCell>
         <mxCell id="e_conn1_lem1" edge="1" parent="1" source="conn1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="dec_lem1">
           <mxGeometry relative="1" as="geometry" />
@@ -157,7 +163,7 @@
         <mxCell id="e_lem4_ya" edge="1" parent="1" source="dec_lem4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_lem4" value="True">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_lem4_tdk" edge="1" parent="1" source="dec_lem4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="dec_lem5" value="Tidak">
+        <mxCell id="e_lem4_tdk" edge="1" parent="1" source="dec_lem4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#dc2626;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#dc2626;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="dec_lem5" value="False">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="e_lem5_ya" edge="1" parent="1" source="dec_lem5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;endArrow=classic;endFill=1;fontColor=#059669;fontStyle=1;fontSize=11;labelBackgroundColor=#ffffff;" target="proc_lem5" value="True">
@@ -172,57 +178,57 @@
         <mxCell id="e_procl1_conn2" edge="1" parent="1" source="proc_lem1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="conn2">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="940" y="752" />
-              <mxPoint x="940" y="1315" />
+              <mxPoint x="940" y="867" />
+              <mxPoint x="940" y="1430" />
             </Array>
           </mxGeometry>
         </mxCell>
         <mxCell id="e_procl2_conn2" edge="1" parent="1" source="proc_lem2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="conn2">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="940" y="847" />
-              <mxPoint x="940" y="1315" />
+              <mxPoint x="940" y="962" />
+              <mxPoint x="940" y="1430" />
             </Array>
           </mxGeometry>
         </mxCell>
         <mxCell id="e_procl3_conn2" edge="1" parent="1" source="proc_lem3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="conn2">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="940" y="942" />
-              <mxPoint x="940" y="1315" />
+              <mxPoint x="940" y="1057" />
+              <mxPoint x="940" y="1430" />
             </Array>
           </mxGeometry>
         </mxCell>
         <mxCell id="e_procl4_conn2" edge="1" parent="1" source="proc_lem4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="conn2">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="940" y="1037" />
-              <mxPoint x="940" y="1315" />
+              <mxPoint x="940" y="1152" />
+              <mxPoint x="940" y="1430" />
             </Array>
           </mxGeometry>
         </mxCell>
         <mxCell id="e_procl5_conn2" edge="1" parent="1" source="proc_lem5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="conn2">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="940" y="1132" />
-              <mxPoint x="940" y="1315" />
+              <mxPoint x="940" y="1247" />
+              <mxPoint x="940" y="1430" />
             </Array>
           </mxGeometry>
         </mxCell>
         <mxCell id="calc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#eef2ff;strokeColor=#6366f1;strokeWidth=1.5;fontColor=#3730a3;fontStyle=0;fontSize=12;shadow=1;" value="&lt;b&gt;Hitung Gaji Lembur &amp;amp; Total Penghasilan:&lt;/b&gt;&lt;br&gt;&lt;br&gt;gajiLembur = persenLembur * gajiPokok&lt;br&gt;totalPenghasilan = gajiPokok + gajiLembur" vertex="1">
-          <mxGeometry height="80" width="260" x="360" y="1400" as="geometry" />
+          <mxGeometry height="80" width="260" x="360" y="1515" as="geometry" />
         </mxCell>
         <mxCell id="out_final" parent="1" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;arcSize=8;fillColor=#e0f2fe;strokeColor=#0284c7;strokeWidth=1.5;fontColor=#0369a1;fontSize=12;fontStyle=1;shadow=1;" value="&lt;b&gt;Output:&lt;/b&gt;&lt;br&gt;gajiPokok, gajiLembur,&lt;br&gt;totalPenghasilan" vertex="1">
-          <mxGeometry height="65" width="240" x="370" y="1515" as="geometry" />
+          <mxGeometry height="65" width="240" x="370" y="1630" as="geometry" />
         </mxCell>
         <mxCell id="end" parent="1" style="rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#ef4444;strokeColor=#dc2626;fontColor=#ffffff;fontStyle=1;fontSize=13;shadow=1;" value="&lt;b&gt;SELESAI&lt;/b&gt;" vertex="1">
-          <mxGeometry height="45" width="140" x="420" y="1620" as="geometry" />
+          <mxGeometry height="45" width="140" x="420" y="1735" as="geometry" />
         </mxCell>
         <mxCell id="e_conn2_calc" edge="1" parent="1" source="conn2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;endArrow=classic;endFill=1;" target="calc">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="490" y="1370" />
-              <mxPoint x="490" y="1370" />
+              <mxPoint x="490" y="1485" />
+              <mxPoint x="490" y="1485" />
             </Array>
           </mxGeometry>
         </mxCell>
@@ -235,19 +241,20 @@
         <mxCell id="e_err_end" edge="1" parent="1" source="err_gol" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#f43f5e;strokeWidth=2;dashed=1;endArrow=classic;endFill=1;labelBackgroundColor=#ffffff;" target="end">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="70" y="549.5" />
-              <mxPoint x="70" y="1617.5" />
+              <mxPoint x="70" y="664.5" />
+              <mxPoint x="70" y="1715" />
+              <mxPoint x="490" y="1715" />
             </Array>
           </mxGeometry>
         </mxCell>
         <mxCell id="EW52TmVBisEa7xlyA044-1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=16;" value="&lt;span style=&quot;color: rgb(71, 85, 105); font-weight: 700;&quot;&gt;TAHAP 1: PENENTUAN GAJI POKOK (GOLONGAN)&lt;/span&gt;" vertex="1">
-          <mxGeometry height="30" width="400" x="600" y="245" as="geometry" />
+          <mxGeometry height="30" width="400" x="600" y="360" as="geometry" />
         </mxCell>
         <mxCell id="EW52TmVBisEa7xlyA044-2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;strokeWidth=1;fontSize=16;" value="&lt;span style=&quot;color: rgb(71, 85, 105); font-weight: 700; text-align: left;&quot;&gt;TAHAP 2: PENENTUAN PERSENTASE LEMBUR&lt;/span&gt;" vertex="1">
-          <mxGeometry height="30" width="380" x="590" y="660" as="geometry" />
+          <mxGeometry height="30" width="380" x="590" y="775" as="geometry" />
         </mxCell>
         <mxCell id="EW52TmVBisEa7xlyA044-3" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;strokeWidth=1;fontSize=16;" value="&lt;span style=&quot;color: rgb(71, 85, 105); font-weight: 700; text-align: left;&quot;&gt;TAHAP 3: KALKULASI PENGHASILAN &amp;amp; OUTPUT&lt;/span&gt;" vertex="1">
-          <mxGeometry height="30" width="380" x="580" y="1340" as="geometry" />
+          <mxGeometry height="30" width="380" x="580" y="1455" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
