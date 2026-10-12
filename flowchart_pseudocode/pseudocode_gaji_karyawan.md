@@ -54,3 +54,17 @@ ALGORITMA:
 
 end
 ```
+
+
+
+## Tabel Uji Java 
+
+| Kasus Uji | Input `golongan` | Input `jamLembur` | Gaji Pokok (`gajiPokok`) | % Lembur (`persenLembur`) | Perhitungan Gaji Lembur (`gajiLembur`) | Total Penghasilan (`totalPenghasilan`) |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Uji 1** | **A** | **1 Jam** | Rp 5.000.000 | 30% (0.30) | 0.30 × 5.000.000 = Rp 1.500.000 | **Rp 6.500.000** |
+| **Uji 2** | **B** | **2 Jam** | Rp 6.500.000 | 32% (0.32) | 0.32 × 6.500.000 = Rp 2.080.000 | **Rp 8.580.000** |
+| **Uji 3** | **C** | **3 Jam** | Rp 9.500.000 | 34% (0.34) | 0.34 × 9.500.000 = Rp 3.230.000 | **Rp 12.730.000** |
+| **Uji 4** | **A** | **4 Jam** | Rp 5.000.000 | 36% (0.36) | 0.36 × 5.000.000 = Rp 1.800.000 | **Rp 6.800.000** |
+| **Uji 5** | **B** | **6 Jam** | Rp 6.500.000 | 38% (0.38) | 0.38 × 6.500.000 = Rp 2.470.000 | **Rp 8.970.000** |
+| **Uji 6** | **C** | **0 Jam** | Rp 9.500.000 | 0% (0.00) | 0.00 × 9.500.000 = Rp 0 | **Rp 9.500.000** |
+| **Uji 7** | **X** | **2 Jam** | - | - | - | *Output: "Error: Golongan tidak valid..."* |
