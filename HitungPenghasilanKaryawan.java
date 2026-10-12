@@ -54,7 +54,7 @@ public class HitungPenghasilanKaryawan {
         System.out.println();
         System.out.println(CYAN + "╭" + "─".repeat(CARD_INNER_WIDTH) + "╮" + RESET);
         System.out.println(CYAN + "│" + RESET + BOLD + BRIGHT_WHITE + "  ◈ SISTEM PERHITUNGAN PENGHASILAN KARYAWAN             " + RESET + CYAN + "│" + RESET);
-        System.out.println(CYAN + "│" + RESET + WHITE +              "    Tugas 1 • Algoritma dan Pemrograman                 " + RESET + CYAN + "│" + RESET);
+        System.out.println(CYAN + "│" + RESET + WHITE +              "    Tugas 2 • Algoritma dan Pemrograman                 " + RESET + CYAN + "│" + RESET);
         System.out.println(CYAN + "╰" + "─".repeat(CARD_INNER_WIDTH) + "╯" + RESET);
         System.out.println();
     }
@@ -158,18 +158,6 @@ public class HitungPenghasilanKaryawan {
         return formatter.format(nominal);
     }
 
-    private static String formatBarisKartu(String bullet, String label, String valueText, String valueColor) {
-        String prefix = String.format("   %s %-22s : ", bullet, label);
-        int sisaSpasi = CARD_INNER_WIDTH - prefix.length() - valueText.length();
-        String padding = " ".repeat(Math.max(0, sisaSpasi));
-
-        return CYAN + "│" + RESET +
-               BRIGHT_WHITE + prefix + RESET +
-               valueColor + valueText + RESET +
-               padding +
-               CYAN + "│" + RESET;
-    }
-
     public static void tampilkanRincianPenghasilan(
             Golongan golongan,
             double gajiPokok,
@@ -193,5 +181,17 @@ public class HitungPenghasilanKaryawan {
         System.out.println(formatBarisKartu("★", "TOTAL PENGHASILAN", formatRupiah(totalPenghasilan), BRIGHT_GREEN + BOLD));
         System.out.println(CYAN + "╰" + "─".repeat(CARD_INNER_WIDTH) + "╯" + RESET);
         System.out.println(BRIGHT_GREEN + "  ✔ " + RESET + WHITE + "Perhitungan berhasil diselesaikan secara akurat." + RESET);
+    }
+
+    private static String formatBarisKartu(String bullet, String label, String valueText, String valueColor) {
+        String prefix = String.format("   %s %-22s : ", bullet, label);
+        int sisaSpasi = CARD_INNER_WIDTH - prefix.length() - valueText.length();
+        String padding = " ".repeat(Math.max(0, sisaSpasi));
+
+        return CYAN + "│" + RESET +
+               BRIGHT_WHITE + prefix + RESET +
+               valueColor + valueText + RESET +
+               padding +
+               CYAN + "│" + RESET;
     }
 }
