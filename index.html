@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perhitungan Penghasilan Karyawan</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-container">
+    <header class="page-header">
+      <span class="badge">Tugas 2 Algoritma &amp; Pemrograman</span>
+      <h1>Penghasilan Karyawan</h1>
+      <p class="subtitle">Hitung gaji pokok dan uang lembur berdasarkan golongan kerja.</p>
+    </header>
+
+    <main class="card">
+      <form id="salary-form">
+        <div class="form-group">
+          <label for="golongan">Golongan Karyawan</label>
+          <select id="golongan" name="golongan" required>
+            <option value="" disabled selected>Pilih Golongan</option>
+            <option value="A">Golongan A — Rp 5.000.000</option>
+            <option value="B">Golongan B — Rp 6.500.000</option>
+            <option value="C">Golongan C — Rp 9.500.000</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="jamLembur">Jumlah Jam Lembur</label>
+          <input
+            id="jamLembur"
+            name="jamLembur"
+            type="number"
+            min="0"
+            step="1"
+            placeholder="0"
+            required
+          >
+          <span class="help-text">Ketentuan lembur: 1 jam (30%), 2 jam (32%), 3 jam (34%), 4 jam (36%), &ge;5 jam (38%).</span>
+        </div>
+
+        <button type="submit" class="submit-btn">Hitung Penghasilan</button>
+      </form>
+
+      <div id="message" class="message" role="alert" hidden></div>
+
+      <section id="result" class="result" hidden>
+        <h2 class="result-title">Rincian Perhitungan</h2>
+        <table class="result-table">
+          <tbody>
+            <tr>
+              <th scope="row">Golongan Karyawan</th>
+              <td id="result-golongan">-</td>
+            </tr>
+            <tr>
+              <th scope="row">Gaji Pokok</th>
+              <td id="result-pokok">-</td>
+            </tr>
+            <tr>
+              <th scope="row">Durasi Lembur</th>
+              <td id="result-jam">-</td>
+            </tr>
+            <tr>
+              <th scope="row">Persentase Lembur</th>
+              <td id="result-persen">-</td>
+            </tr>
+            <tr>
+              <th scope="row">Nominal Gaji Lembur</th>
+              <td id="result-lembur">-</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <th scope="row">Total Penghasilan</th>
+              <td id="result-total">-</td>
+            </tr>
+          </tfoot>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const form = document.querySelector('#salary-form');
+    const result = document.querySelector('#result');
+    const message = document.querySelector('#message');
+
+    // Mengubah angka biasa menjadi format mata uang Rupiah
+    function formatRupiah(angka) {
+      return 'Rp ' + Number(angka).toLocaleString('id-ID');
+    }
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault(); // Mencegah reload halaman
+      message.hidden = true;
+      result.hidden = true;
+
+      // 1. Ambil nilai input dari form
+      const golongan = document.querySelector('#golongan').value;
+      const jam = document.querySelector('#jamLembur').value;
+
+      try {
+        // 2. Kirim data ke Java WebServer
+        const response = await fetch(`/hitung?golongan=${golongan}&jam=${jam}`);
+        const data = await response.json();
+
+        // Tampilkan pesan jika ada error dari server
+        if (data.error) {
+          message.textContent = data.error;
+          message.hidden = false;
+          return;
+        }
+
+        // 3. Tampilkan hasil perhitungan ke tabel
+        document.querySelector('#result-golongan').textContent = `Golongan ${data.golongan}`;
+        document.querySelector('#result-pokok').textContent = formatRupiah(data.gajiPokok);
+        document.querySelector('#result-jam').textContent = `${data.jamLembur} Jam`;
+        document.querySelector('#result-persen').textContent = `${data.persenLembur}%`;
+        document.querySelector('#result-lembur').textContent = formatRupiah(data.gajiLembur);
+        document.querySelector('#result-total').textContent = formatRupiah(data.totalPenghasilan);
+        result.hidden = false;
+
+      } catch (err) {
+        message.textContent = 'Gagal terhubung ke server Java. Pastikan WebServer sedang berjalan.';
+        message.hidden = false;
+      }
+    });
+  </script>
+</body>
+</html>
