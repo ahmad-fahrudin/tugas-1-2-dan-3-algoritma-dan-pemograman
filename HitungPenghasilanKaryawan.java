@@ -13,23 +13,6 @@ public class HitungPenghasilanKaryawan {
     public static final double PERSEN_LEMBUR_5_JAM_KEATAS = 0.38;
     public static final double PERSEN_LEMBUR_DEFAULT = 0.00;
 
-    // ANSI ESCAPE CODES UNTUK STYLING MODERN TERMINAL (HIGH CONTRAST OPENCODE STYLE)
-    public static final String RESET = "\u001B[0m";
-    public static final String BOLD = "\u001B[1m";
-
-    // Text Colors (High Contrast untuk Tema Gelap / Terang)
-    public static final String CYAN = "\u001B[36m";
-    public static final String BRIGHT_CYAN = "\u001B[96m";
-    public static final String BRIGHT_GREEN = "\u001B[92m";
-    public static final String BRIGHT_YELLOW = "\u001B[93m";
-    public static final String BRIGHT_RED = "\u001B[91m";
-    public static final String BRIGHT_WHITE = "\u001B[97m";
-    public static final String WHITE = "\u001B[37m";
-    public static final String BRIGHT_MAGENTA = "\u001B[95m";
-
-    // Lebar bagian dalam kartu UI
-    private static final int CARD_INNER_WIDTH = 56;
-
     public static void main(String[] args) {
         try (Scanner scanner = new Scanner(System.in)) {
             boolean lanjut = true;
@@ -39,11 +22,11 @@ public class HitungPenghasilanKaryawan {
             while (lanjut) {
                 jalankanPerhitungan(scanner);
 
-                System.out.print("\n" + CYAN + "? " + RESET + BOLD + BRIGHT_WHITE + "Apakah ingin menghitung gaji lagi? " + RESET + BRIGHT_YELLOW + "(y/n) › " + RESET);
+                System.out.print("\n" + TerminalStyle.CYAN + "? " + TerminalStyle.RESET + TerminalStyle.BOLD + TerminalStyle.BRIGHT_WHITE + "Apakah ingin menghitung gaji lagi? " + TerminalStyle.RESET + TerminalStyle.BRIGHT_YELLOW + "(y/n) › " + TerminalStyle.RESET);
                 String pilihan = scanner.nextLine().trim();
                 if (pilihan.equalsIgnoreCase("n") || pilihan.equalsIgnoreCase("t")) {
                     lanjut = false;
-                    System.out.println("\n" + BRIGHT_GREEN + "✔ " + RESET + BOLD + BRIGHT_WHITE + "Program selesai. " + RESET + WHITE + "Terima kasih telah menggunakan program ini!\n" + RESET);
+                    System.out.println("\n" + TerminalStyle.BRIGHT_GREEN + "✔ " + TerminalStyle.RESET + TerminalStyle.BOLD + TerminalStyle.BRIGHT_WHITE + "Program selesai. " + TerminalStyle.RESET + TerminalStyle.WHITE + "Terima kasih telah menggunakan program ini!\n" + TerminalStyle.RESET);
                 }
                 System.out.println();
             }
@@ -52,25 +35,25 @@ public class HitungPenghasilanKaryawan {
 
     public static void tampilkanBanner() {
         System.out.println();
-        System.out.println(CYAN + "╭" + "─".repeat(CARD_INNER_WIDTH) + "╮" + RESET);
-        System.out.println(CYAN + "│" + RESET + BOLD + BRIGHT_WHITE + "  ◈ SISTEM PERHITUNGAN PENGHASILAN KARYAWAN             " + RESET + CYAN + "│" + RESET);
-        System.out.println(CYAN + "│" + RESET + WHITE +              "    Tugas 2 • Algoritma dan Pemrograman                 " + RESET + CYAN + "│" + RESET);
-        System.out.println(CYAN + "╰" + "─".repeat(CARD_INNER_WIDTH) + "╯" + RESET);
+        System.out.println(TerminalStyle.CYAN + "╭" + "─".repeat(TerminalStyle.CARD_INNER_WIDTH) + "╮" + TerminalStyle.RESET);
+        System.out.println(TerminalStyle.CYAN + "│" + TerminalStyle.RESET + TerminalStyle.BOLD + TerminalStyle.BRIGHT_WHITE + "  ◈ SISTEM PERHITUNGAN PENGHASILAN KARYAWAN             " + TerminalStyle.RESET + TerminalStyle.CYAN + "│" + TerminalStyle.RESET);
+        System.out.println(TerminalStyle.CYAN + "│" + TerminalStyle.RESET + TerminalStyle.WHITE +              "    Tugas 2 • Algoritma dan Pemrograman                 " + TerminalStyle.RESET + TerminalStyle.CYAN + "│" + TerminalStyle.RESET);
+        System.out.println(TerminalStyle.CYAN + "╰" + "─".repeat(TerminalStyle.CARD_INNER_WIDTH) + "╯" + TerminalStyle.RESET);
         System.out.println();
     }
 
     public static void tampilkanError(String pesan) {
-        System.out.println("\n" + BRIGHT_RED + BOLD + "  ✖ [ERROR] " + RESET + BRIGHT_RED + pesan + RESET + "\n");
+        System.out.println("\n" + TerminalStyle.BRIGHT_RED + TerminalStyle.BOLD + "  ✖ [ERROR] " + TerminalStyle.RESET + TerminalStyle.BRIGHT_RED + pesan + TerminalStyle.RESET + "\n");
     }
 
     public static void jalankanPerhitungan(Scanner scanner) {
         // Form Input Header
-        System.out.println(CYAN + "╭─ [ FORM INPUT DATA ] " + "─".repeat(CARD_INNER_WIDTH - 22) + "╮" + RESET);
-        System.out.println(CYAN + "│" + RESET + WHITE + "  Silakan masukkan golongan dan jam lembur karyawan     " + RESET + CYAN + "│" + RESET);
-        System.out.println(CYAN + "╰" + "─".repeat(CARD_INNER_WIDTH) + "╯" + RESET);
+        System.out.println(TerminalStyle.CYAN + "╭─ [ FORM INPUT DATA ] " + "─".repeat(TerminalStyle.CARD_INNER_WIDTH - 22) + "╮" + TerminalStyle.RESET);
+        System.out.println(TerminalStyle.CYAN + "│" + TerminalStyle.RESET + TerminalStyle.WHITE + "  Silakan masukkan golongan dan jam lembur karyawan     " + TerminalStyle.RESET + TerminalStyle.CYAN + "│" + TerminalStyle.RESET);
+        System.out.println(TerminalStyle.CYAN + "╰" + "─".repeat(TerminalStyle.CARD_INNER_WIDTH) + "╯" + TerminalStyle.RESET);
 
         // INPUT DATA GOLONGAN
-        System.out.print(CYAN + "  ➜ " + RESET + BRIGHT_WHITE + "Masukkan Golongan Karyawan " + RESET + BRIGHT_YELLOW + "(A / B / C)" + RESET + " : ");
+        System.out.print(TerminalStyle.CYAN + "  ➜ " + TerminalStyle.RESET + TerminalStyle.BRIGHT_WHITE + "Masukkan Golongan Karyawan " + TerminalStyle.RESET + TerminalStyle.BRIGHT_YELLOW + "(A / B / C)" + TerminalStyle.RESET + " : ");
         String inputGolongan = scanner.nextLine().trim();
 
         if (inputGolongan.isEmpty()) {
@@ -92,7 +75,7 @@ public class HitungPenghasilanKaryawan {
         double gajiPokok = golongan.getGajiPokok();
 
         // INPUT DATA JAM LEMBUR
-        System.out.print(CYAN + "  ➜ " + RESET + BRIGHT_WHITE + "Masukkan Jumlah Jam Lembur " + RESET + BRIGHT_YELLOW + "(jam)" + RESET + "        : ");
+        System.out.print(TerminalStyle.CYAN + "  ➜ " + TerminalStyle.RESET + TerminalStyle.BRIGHT_WHITE + "Masukkan Jumlah Jam Lembur " + TerminalStyle.RESET + TerminalStyle.BRIGHT_YELLOW + "(jam)" + TerminalStyle.RESET + "        : ");
         String inputLembur = scanner.nextLine().trim();
         int jamLembur;
         try {
@@ -169,29 +152,19 @@ public class HitungPenghasilanKaryawan {
         int persenDisplay = (int) Math.round(persenLembur * 100);
 
         System.out.println();
-        System.out.println(CYAN + "╭" + "─".repeat(CARD_INNER_WIDTH) + "╮" + RESET);
-        System.out.println(CYAN + "│" + RESET + BOLD + BRIGHT_CYAN + "  RINCIAN PENGHASILAN KARYAWAN                          " + RESET + CYAN + "│" + RESET);
-        System.out.println(CYAN + "├" + "─".repeat(CARD_INNER_WIDTH) + "┤" + RESET);
-        System.out.println(formatBarisKartu("•", "Golongan Karyawan", "Golongan " + golongan, BRIGHT_CYAN + BOLD));
-        System.out.println(formatBarisKartu("•", "Gaji Pokok", formatRupiah(gajiPokok), BRIGHT_YELLOW));
-        System.out.println(formatBarisKartu("•", "Durasi Lembur", jamLembur + " Jam", BRIGHT_WHITE));
-        System.out.println(formatBarisKartu("•", "Persentase Lembur", persenDisplay + "%", BRIGHT_MAGENTA));
-        System.out.println(formatBarisKartu("•", "Nominal Gaji Lembur", formatRupiah(gajiLembur), BRIGHT_YELLOW));
-        System.out.println(CYAN + "├" + "─".repeat(CARD_INNER_WIDTH) + "┤" + RESET);
-        System.out.println(formatBarisKartu("★", "TOTAL PENGHASILAN", formatRupiah(totalPenghasilan), BRIGHT_GREEN + BOLD));
-        System.out.println(CYAN + "╰" + "─".repeat(CARD_INNER_WIDTH) + "╯" + RESET);
-        System.out.println(BRIGHT_GREEN + "  ✔ " + RESET + WHITE + "Perhitungan berhasil diselesaikan secara akurat." + RESET);
+        System.out.println(TerminalStyle.CYAN + "╭" + "─".repeat(TerminalStyle.CARD_INNER_WIDTH) + "╮" + TerminalStyle.RESET);
+        System.out.println(TerminalStyle.CYAN + "│" + TerminalStyle.RESET + TerminalStyle.BOLD + TerminalStyle.BRIGHT_CYAN + "  RINCIAN PENGHASILAN KARYAWAN                          " + TerminalStyle.RESET + TerminalStyle.CYAN + "│" + TerminalStyle.RESET);
+        System.out.println(TerminalStyle.CYAN + "├" + "─".repeat(TerminalStyle.CARD_INNER_WIDTH) + "┤" + TerminalStyle.RESET);
+        System.out.println(TerminalStyle.formatBarisKartu("•", "Golongan Karyawan", "Golongan " + golongan, TerminalStyle.BRIGHT_CYAN + TerminalStyle.BOLD));
+        System.out.println(TerminalStyle.formatBarisKartu("•", "Gaji Pokok", formatRupiah(gajiPokok), TerminalStyle.BRIGHT_YELLOW));
+        System.out.println(TerminalStyle.formatBarisKartu("•", "Durasi Lembur", jamLembur + " Jam", TerminalStyle.BRIGHT_WHITE));
+        System.out.println(TerminalStyle.formatBarisKartu("•", "Persentase Lembur", persenDisplay + "%", TerminalStyle.BRIGHT_MAGENTA));
+        System.out.println(TerminalStyle.formatBarisKartu("•", "Nominal Gaji Lembur", formatRupiah(gajiLembur), TerminalStyle.BRIGHT_YELLOW));
+        System.out.println(TerminalStyle.CYAN + "├" + "─".repeat(TerminalStyle.CARD_INNER_WIDTH) + "┤" + TerminalStyle.RESET);
+        System.out.println(TerminalStyle.formatBarisKartu("★", "TOTAL PENGHASILAN", formatRupiah(totalPenghasilan), TerminalStyle.BRIGHT_GREEN + TerminalStyle.BOLD));
+        System.out.println(TerminalStyle.CYAN + "╰" + "─".repeat(TerminalStyle.CARD_INNER_WIDTH) + "╯" + TerminalStyle.RESET);
+        System.out.println(TerminalStyle.BRIGHT_GREEN + "  ✔ " + TerminalStyle.RESET + TerminalStyle.WHITE + "Perhitungan berhasil diselesaikan secara akurat." + TerminalStyle.RESET);
     }
 
-    private static String formatBarisKartu(String bullet, String label, String valueText, String valueColor) {
-        String prefix = String.format("   %s %-22s : ", bullet, label);
-        int sisaSpasi = CARD_INNER_WIDTH - prefix.length() - valueText.length();
-        String padding = " ".repeat(Math.max(0, sisaSpasi));
 
-        return CYAN + "│" + RESET +
-               BRIGHT_WHITE + prefix + RESET +
-               valueColor + valueText + RESET +
-               padding +
-               CYAN + "│" + RESET;
-    }
 }
