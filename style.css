@@ -95,6 +95,62 @@ input:focus {
   margin-top: 6px;
 }
 
+.lembur-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.lembur-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: #557bb0;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.lembur-chip:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.lembur-chip span {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.lembur-chip:hover span {
+  color: #475569;
+}
+
+.lembur-chip.active {
+  background-color: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff;
+}
+
+.lembur-chip.active span {
+  color: #94a3b8;
+}
+
+.lembur-chip:focus-visible {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
 .submit-btn {
   width: 100%;
   margin-top: 8px;

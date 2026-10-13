@@ -37,7 +37,14 @@
             placeholder="0"
             required
           >
-          <span class="help-text">Ketentuan lembur: 1 jam (30%), 2 jam (32%), 3 jam (34%), 4 jam (36%), &ge;5 jam (38%).</span>
+          <span class="help-text">Ketentuan lembur (klik untuk memilih):</span>
+          <div class="lembur-chips">
+            <button type="button" class="lembur-chip" data-jam="1">1 jam <span>(30%)</span></button>
+            <button type="button" class="lembur-chip" data-jam="2">2 jam <span>(32%)</span></button>
+            <button type="button" class="lembur-chip" data-jam="3">3 jam <span>(34%)</span></button>
+            <button type="button" class="lembur-chip" data-jam="4">4 jam <span>(36%)</span></button>
+            <button type="button" class="lembur-chip" data-jam="5">&ge;5 jam <span>(38%)</span></button>
+          </div>
         </div>
 
         <button type="submit" class="submit-btn">Hitung Penghasilan</button>
@@ -85,11 +92,35 @@
     const form = document.querySelector('#salary-form');
     const result = document.querySelector('#result');
     const message = document.querySelector('#message');
+    const jamInput = document.querySelector('#jamLembur');
+    const lemburChips = document.querySelectorAll('.lembur-chip');
 
     // Mengubah angka biasa menjadi format mata uang Rupiah
     function formatRupiah(angka) {
       return 'Rp ' + Number(angka).toLocaleString('id-ID');
     }
+
+    // Sinkronisasi status aktif tombol ketentuan lembur
+    function updateActiveChip() {
+      const val = parseInt(jamInput.value, 10);
+      lemburChips.forEach(chip => {
+        const chipJam = parseInt(chip.dataset.jam, 10);
+        const isActive = !isNaN(val) && ((chipJam === 5 && val >= 5) || val === chipJam);
+        chip.classList.toggle('active', isActive);
+      });
+    }
+
+    // Event klik untuk mengisi input jam lembur secara otomatis
+    lemburChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        jamInput.value = chip.dataset.jam;
+        updateActiveChip();
+        jamInput.focus();
+      });
+    });
+
+    // Perbarui status tombol ketika pengguna mengetik manual di input
+    jamInput.addEventListener('input', updateActiveChip);
 
     form.addEventListener('submit', async event => {
       event.preventDefault(); // Mencegah reload halaman
