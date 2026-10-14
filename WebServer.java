@@ -33,10 +33,6 @@ public class WebServer {
         System.out.println("==================================================");
     }
 
-    // =========================================================================
-    // 1. LOGIKA PERHITUNGAN SESUAI SOAL TUGAS 2 (OPERATOR & STATEMEN IF)
-    // =========================================================================
-
     // Tahap 1: Menentukan Gaji Pokok berdasarkan Golongan menggunakan Statemen IF
     public static double tentukanGajiPokok(char golongan) {
         char kode = Character.toUpperCase(golongan);
@@ -78,10 +74,6 @@ public class WebServer {
     public static double hitungTotalPenghasilan(double gajiPokok, double gajiLembur) {
         return gajiPokok + gajiLembur;
     }
-
-    // =========================================================================
-    // 2. SERVER WEB (MENERIMA INPUT DARI HTML & MENGIRIM HASIL)
-    // =========================================================================
 
     // Menerima parameter dari browser, memproses perhitungan, dan mengirim JSON
     private static void handleHitung(HttpExchange exchange) throws IOException {
