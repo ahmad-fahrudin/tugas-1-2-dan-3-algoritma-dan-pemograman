@@ -1,14 +1,7 @@
 /**
  * Payroll3D & Roblox Office Simulator
  * Tugas 3: Algoritma dan Pemrograman (Operator, IF, dan Array)
- * Features:
- * - FPS & 3rd-Person POV Roblox Character
- * - WASD + Mouse Look (Pointer Lock)
- * - Office Room with City View Window, Ergonomic Chair & Desk
- * - Press [E] to Sit Down at Chair & Open Salary Terminal
- * - Press [ESC] to Stand Up & Resume Walking
- * - Interactive 3D Banknote Stacks, Monitor Screen, Holographic Slip & Coin Burst
- * - Pure Native JS + Three.js (Zero Node.js dependency)
+ * Standard Minimalist UI & Balanced Viewport
  */
 
 (function () {
@@ -20,14 +13,20 @@
   let clock;
 
   // Camera & POV State
-  let povMode = 'FPS'; // 'FPS' | 'THIRD_PERSON' | 'SEATED'
-  let cameraYaw = 0;
-  let cameraPitch = 0;
+  let povMode = 'FPS'; // 'FPS' | 'THIRD_PERSON'
+  let cameraYaw = Math.PI; // Face desk at start
+  let cameraPitch = -0.06;
   let isPointerLocked = false;
+  let isDraggingCanvas = false;
+  let previousMousePos = { x: 0, y: 0 };
+
+  // Seated Zoom via Mouse Wheel (0 = current POV mentok zoom out, 1 = max zoom in)
+  let seatedZoom = 0;
+  let targetSeatedZoom = 0;
 
   // Player State
   const player = {
-    pos: new THREE.Vector3(0, 0, 4.5), // Start in the room facing desk
+    pos: new THREE.Vector3(0, 0, 4.0),
     vel: new THREE.Vector3(),
     speed: 3.8,
     sprintSpeed: 6.2,
@@ -44,7 +43,6 @@
     rightLeg: null
   };
 
-  // Keyboard Keys
   const keys = {
     forward: false,
     backward: false,
@@ -55,7 +53,7 @@
   };
 
   // Chair & Interaction Target
-  const chairPos = new THREE.Vector3(0, 0, 1.45);
+  const chairPos = new THREE.Vector3(0, 0, 1.55);
   const CHAIR_INTERACTION_DIST = 2.4;
   let isNearChair = false;
 
@@ -74,16 +72,11 @@
     C: { name: 'Golongan C', salary: 9500000, color: '#c084fc', hex: 0xc084fc, index: 2 }
   };
 
-  // Colliders for Room
+  // Colliders for Room Objects (AABB)
   const colliders = [
-    // Desk AABB
-    { minX: -2.3, maxX: 2.3, minZ: -1.4, maxZ: 0.4 },
-    // Bookshelf
+    { minX: -2.3, maxX: 2.3, minZ: -1.4, maxZ: 0.35 },
     { minX: -6.8, maxX: -4.8, minZ: -6.8, maxZ: -5.8 },
-    // Water Dispenser
-    { minX: 4.8, maxX: 6.2, minZ: -6.8, maxZ: -5.8 },
-    // Filing Cabinet
-    { minX: -6.8, maxX: -5.5, minZ: 2.0, maxZ: 4.5 }
+    { minX: 4.8, maxX: 6.2, minZ: -6.8, maxZ: -5.8 }
   ];
 
   // --- SOUND EFFECTS (Web Audio API Synthesizer) ---
@@ -214,37 +207,28 @@
   // --- INITIALIZATION ---
   function init() {
     container = document.getElementById('canvas3d-container');
-    if (!container || !window.THREE) {
-      console.warn('Canvas container or THREE.js not available.');
-      return;
-    }
+    if (!container || !window.THREE) return;
 
     clock = new THREE.Clock();
 
-    // 1. Scene
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x060913);
-    scene.fog = new THREE.FogExp2(0x060913, 0.035);
+    scene.background = new THREE.Color(0x090d16);
+    scene.fog = new THREE.FogExp2(0x090d16, 0.035);
 
-    // 2. Camera
     const aspect = container.clientWidth / container.clientHeight;
     camera = new THREE.PerspectiveCamera(65, aspect, 0.1, 100);
-    camera.position.set(player.pos.x, player.pos.y + 1.45, player.pos.z);
+    camera.position.set(player.pos.x, player.pos.y + 1.62, player.pos.z);
 
-    // 3. Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 1.1;
     container.appendChild(renderer.domElement);
 
-    // 4. Lights
     setupLighting();
-
-    // 5. Environment & Office Room
     buildOfficeRoom();
     buildWorkstationDesk();
     buildOfficeChair();
@@ -253,15 +237,11 @@
     buildHologramSlip();
     buildMoneyGroup();
     buildSteamParticles();
-
-    // 6. Build 3D Roblox Player Model
     buildRobloxPlayer();
 
-    // 7. Event Handlers (WASD, Mouse Look, Pointer Lock)
     setupInputControls();
 
-    // Initial calculations & textures
-    updateMonitor('READY', 'Sistem Siap Digunakan');
+    updateMonitor('Siap', 'Menunggu input...');
     updateIdBadge('A', 5000000);
     updateHologramSlip({
       golongan: 'A',
@@ -277,123 +257,90 @@
 
   // --- LIGHTING ---
   function setupLighting() {
-    // Ambient light
     const ambient = new THREE.AmbientLight(0x1e293b, 1.4);
     scene.add(ambient);
 
-    // Ceiling Panel Light (Center)
-    const ceilingLight = new THREE.PointLight(0xf8fafc, 2.2, 16);
+    const ceilingLight = new THREE.PointLight(0xf8fafc, 2.0, 16);
     ceilingLight.position.set(0, 4.2, 0);
     ceilingLight.castShadow = true;
-    ceilingLight.shadow.mapSize.width = 1024;
-    ceilingLight.shadow.mapSize.height = 1024;
-    ceilingLight.shadow.bias = -0.0005;
     scene.add(ceilingLight);
 
-    // Warm Desk Lamp Spot
-    const deskSpot = new THREE.SpotLight(0xfef08a, 2.8, 8, Math.PI / 3.5, 0.4, 1);
-    deskSpot.position.set(-1.8, 2.8, 0.8);
-    deskSpot.target.position.set(0, 1.2, 0.3);
+    const deskSpot = new THREE.SpotLight(0xfef08a, 2.5, 8, Math.PI / 3.5, 0.4, 1);
+    deskSpot.position.set(-1.8, 2.6, 0.8);
+    deskSpot.target.position.set(0, 1.15, 0.3);
     deskSpot.castShadow = true;
     scene.add(deskSpot);
     scene.add(deskSpot.target);
 
-    // Cyan Neon Accent Light from Window/Walls
-    const cyanLight = new THREE.PointLight(0x38bdf8, 1.8, 14);
+    const cyanLight = new THREE.PointLight(0x38bdf8, 1.5, 14);
     cyanLight.position.set(5.5, 3.0, 1.0);
     scene.add(cyanLight);
-
-    // Emerald Terminal Glow
-    const greenLight = new THREE.PointLight(0x10b981, 1.2, 5);
-    greenLight.position.set(1.4, 2.2, 0.5);
-    scene.add(greenLight);
   }
 
-  // --- OFFICE ROOM CONSTRUCTION ---
+  // --- OFFICE ROOM ---
   function buildOfficeRoom() {
     const roomGroup = new THREE.Group();
 
-    // 1. Floor (Parquet Wood & Grid Trim)
+    // Floor
     const floorGeo = new THREE.PlaneGeometry(14, 14);
-    const floorMat = new THREE.MeshStandardMaterial({
-      color: 0x111827,
-      roughness: 0.45,
-      metalness: 0.15
-    });
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.5, metalness: 0.1 });
     const floorMesh = new THREE.Mesh(floorGeo, floorMat);
     floorMesh.rotation.x = -Math.PI / 2;
-    floorMesh.position.y = 0;
     floorMesh.receiveShadow = true;
     roomGroup.add(floorMesh);
 
-    // Subtle Rug under Desk
-    const rugGeo = new THREE.PlaneGeometry(6, 5);
-    const rugMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.9 });
-    const rug = new THREE.Mesh(rugGeo, rugMat);
+    // Rug
+    const rug = new THREE.Mesh(
+      new THREE.PlaneGeometry(6, 5),
+      new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.9 })
+    );
     rug.rotation.x = -Math.PI / 2;
     rug.position.set(0, 0.005, 0.5);
     rug.receiveShadow = true;
     roomGroup.add(rug);
 
-    // 2. Ceiling
-    const ceilGeo = new THREE.PlaneGeometry(14, 14);
-    const ceilMat = new THREE.MeshStandardMaterial({ color: 0x0b101d, roughness: 0.8 });
-    const ceiling = new THREE.Mesh(ceilGeo, ceilMat);
+    // Ceiling
+    const ceiling = new THREE.Mesh(
+      new THREE.PlaneGeometry(14, 14),
+      new THREE.MeshStandardMaterial({ color: 0x0b101d, roughness: 0.8 })
+    );
     ceiling.rotation.x = Math.PI / 2;
     ceiling.position.y = 4.5;
     roomGroup.add(ceiling);
 
-    // Ceiling Light Fixture
-    const lightFixtureGeo = new THREE.BoxGeometry(3, 0.1, 2);
-    const lightFixtureMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const fixture = new THREE.Mesh(lightFixtureGeo, lightFixtureMat);
-    fixture.position.set(0, 4.45, 0);
-    roomGroup.add(fixture);
+    const lightFixture = new THREE.Mesh(
+      new THREE.BoxGeometry(3, 0.1, 2),
+      new THREE.MeshBasicMaterial({ color: 0xffffff })
+    );
+    lightFixture.position.set(0, 4.45, 0);
+    roomGroup.add(lightFixture);
 
-    // 3. Back Wall (z = -7) with Acoustic Wooden Slats & Company Plaque
-    const backWallGeo = new THREE.PlaneGeometry(14, 4.5);
+    // Walls
     const wallMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.7 });
-    const backWall = new THREE.Mesh(backWallGeo, wallMat);
+    const backWall = new THREE.Mesh(new THREE.PlaneGeometry(14, 4.5), wallMat);
     backWall.position.set(0, 2.25, -7);
     backWall.receiveShadow = true;
     roomGroup.add(backWall);
 
-    // Company Wall Plaque
-    const plaqueGeo = new THREE.BoxGeometry(4.2, 1.1, 0.08);
-    const plaqueMat = new THREE.MeshStandardMaterial({ color: 0x090d16, metalness: 0.8, roughness: 0.2 });
-    const plaque = new THREE.Mesh(plaqueGeo, plaqueMat);
-    plaque.position.set(0, 3.0, -6.92);
-    roomGroup.add(plaque);
-
-    // Plaque Neon Glow Bar
-    const glowBarGeo = new THREE.BoxGeometry(4.4, 0.05, 0.04);
-    const glowBarMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
-    const glowBar = new THREE.Mesh(glowBarGeo, glowBarMat);
-    glowBar.position.set(0, 3.6, -6.9);
-    roomGroup.add(glowBar);
-
-    // 4. Front Wall (z = 7)
-    const frontWall = new THREE.Mesh(backWallGeo, wallMat);
+    const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(14, 4.5), wallMat);
     frontWall.rotation.y = Math.PI;
     frontWall.position.set(0, 2.25, 7);
     frontWall.receiveShadow = true;
     roomGroup.add(frontWall);
 
-    // 5. Left Wall (x = -7) with Bookshelves
-    const sideWallGeo = new THREE.PlaneGeometry(14, 4.5);
-    const leftWall = new THREE.Mesh(sideWallGeo, wallMat);
+    const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(14, 4.5), wallMat);
     leftWall.rotation.y = Math.PI / 2;
     leftWall.position.set(-7, 2.25, 0);
     leftWall.receiveShadow = true;
     roomGroup.add(leftWall);
 
     // Bookshelf
-    const shelfGeo = new THREE.BoxGeometry(1.6, 3.2, 0.8);
-    const shelfMat = new THREE.MeshStandardMaterial({ color: 0x182234, roughness: 0.5 });
-    const shelf = new THREE.Mesh(shelfGeo, shelfMat);
+    const shelf = new THREE.Mesh(
+      new THREE.BoxGeometry(1.6, 3.2, 0.8),
+      new THREE.MeshStandardMaterial({ color: 0x182234, roughness: 0.5 })
+    );
     shelf.position.set(-5.8, 1.6, -6.3);
     shelf.castShadow = true;
-    shelf.receiveShadow = true;
     roomGroup.add(shelf);
 
     // Water Dispenser
@@ -405,7 +352,6 @@
     wdBase.castShadow = true;
     roomGroup.add(wdBase);
 
-    // Blue Water Bottle on Top
     const bottle = new THREE.Mesh(
       new THREE.CylinderGeometry(0.24, 0.24, 0.65, 16),
       new THREE.MeshStandardMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.8, roughness: 0.1 })
@@ -413,93 +359,65 @@
     bottle.position.set(5.5, 1.7, -6.3);
     roomGroup.add(bottle);
 
-    // 6. Right Wall (x = 7) with Massive Panorama Glass Window & City Sky
-    const windowFrameGeo = new THREE.BoxGeometry(0.2, 3.6, 10);
-    const frameMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 });
-    const winFrame = new THREE.Mesh(windowFrameGeo, frameMat);
+    // Window & Skyline
+    const winFrame = new THREE.Mesh(
+      new THREE.BoxGeometry(0.2, 3.6, 10),
+      new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 })
+    );
     winFrame.position.set(6.9, 2.2, 0);
     roomGroup.add(winFrame);
 
-    // Glass Pane
-    const glassGeo = new THREE.PlaneGeometry(9.6, 3.2);
-    const glassMat = new THREE.MeshStandardMaterial({
-      color: 0x38bdf8,
-      transparent: true,
-      opacity: 0.2,
-      roughness: 0.05
-    });
-    const glass = new THREE.Mesh(glassGeo, glassMat);
+    const glass = new THREE.Mesh(
+      new THREE.PlaneGeometry(9.6, 3.2),
+      new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.2, roughness: 0.05 })
+    );
     glass.rotation.y = -Math.PI / 2;
     glass.position.set(6.85, 2.2, 0);
     roomGroup.add(glass);
 
-    // Low-poly City Skyline outside window
     const cityGroup = new THREE.Group();
     cityGroup.position.set(16, 0, 0);
-
     const bldColors = [0x0f172a, 0x1e293b, 0x0d1527, 0x131f37];
     for (let i = -12; i <= 12; i += 2.5) {
       const height = 6 + Math.random() * 12;
       const width = 1.8 + Math.random() * 1.5;
-      const bldGeo = new THREE.BoxGeometry(width, height, width);
-      const bldMat = new THREE.MeshStandardMaterial({
-        color: bldColors[Math.floor(Math.random() * bldColors.length)],
-        roughness: 0.6
-      });
-      const bld = new THREE.Mesh(bldGeo, bldMat);
+      const bld = new THREE.Mesh(
+        new THREE.BoxGeometry(width, height, width),
+        new THREE.MeshStandardMaterial({ color: bldColors[Math.floor(Math.random() * bldColors.length)], roughness: 0.6 })
+      );
       bld.position.set(0, height / 2, i);
       cityGroup.add(bld);
-
-      // Glowing window dots on skyscraper
-      for (let wy = 2; wy < height - 1; wy += 1.2) {
-        if (Math.random() > 0.4) {
-          const dot = new THREE.Mesh(
-            new THREE.PlaneGeometry(0.25, 0.25),
-            new THREE.MeshBasicMaterial({ color: Math.random() > 0.3 ? 0xfef08a : 0x38bdf8 })
-          );
-          dot.rotation.y = -Math.PI / 2;
-          dot.position.set(-width / 2 - 0.02, wy, i + (Math.random() - 0.5) * (width - 0.6));
-          cityGroup.add(dot);
-        }
-      }
     }
     roomGroup.add(cityGroup);
 
     scene.add(roomGroup);
   }
 
-  // --- ERGONOMIC OFFICE CHAIR ---
+  // --- ERGONOMIC CHAIR ---
   let chairGroup;
   function buildOfficeChair() {
     chairGroup = new THREE.Group();
     chairGroup.position.copy(chairPos);
-    chairGroup.rotation.y = Math.PI; // Face the desk
+    chairGroup.rotation.y = 0; // Naturally faces negative Z (desk)
 
     const chromeMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9, roughness: 0.2 });
     const seatMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 });
     const cushionMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.7 });
 
-    // 5-Star Caster Base
     const starCenter = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.08, 16), chromeMat);
-    starCenter.position.y = 0.1;
+    starCenter.position.y = 0.08;
     chairGroup.add(starCenter);
 
     for (let i = 0; i < 5; i++) {
       const angle = (i * Math.PI * 2) / 5;
       const leg = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.42), chromeMat);
-      leg.position.set(Math.sin(angle) * 0.22, 0.09, Math.cos(angle) * 0.22);
+      leg.position.set(Math.sin(angle) * 0.22, 0.07, Math.cos(angle) * 0.22);
       leg.rotation.y = angle;
       chairGroup.add(leg);
-
-      // Wheel
-      const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.03, 8), chromeMat);
-      wheel.position.set(Math.sin(angle) * 0.42, 0.04, Math.cos(angle) * 0.42);
-      chairGroup.add(wheel);
     }
 
-    // Stem cylinder
     const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.55, 16), chromeMat);
-    stem.position.y = 0.38;
+    stem.position.y = 0.36;
     chairGroup.add(stem);
 
     // Seat cushion
@@ -509,60 +427,61 @@
     seat.receiveShadow = true;
     chairGroup.add(seat);
 
-    // Backrest
+    // Backrest (local z = +0.32, well behind the seated user)
     const backrest = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.75, 0.08), seatMat);
-    backrest.position.set(0, 1.05, 0.3);
-    backrest.rotation.x = -0.1;
+    backrest.position.set(0, 1.05, 0.32);
+    backrest.rotation.x = 0.08;
     backrest.castShadow = true;
     chairGroup.add(backrest);
 
-    // Headrest
+    // Headrest (local z = +0.36)
     const headrest = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.2, 0.08), cushionMat);
-    headrest.position.set(0, 1.5, 0.34);
+    headrest.position.set(0, 1.45, 0.36);
     chairGroup.add(headrest);
 
-    // Left & Right Armrests
+    // Armrests
     const armrestGeo = new THREE.BoxGeometry(0.08, 0.04, 0.36);
     const armL = new THREE.Mesh(armrestGeo, chromeMat);
-    armL.position.set(-0.35, 0.88, 0.05);
+    armL.position.set(-0.38, 0.88, 0.05);
     chairGroup.add(armL);
 
     const armR = new THREE.Mesh(armrestGeo, chromeMat);
-    armR.position.set(0.35, 0.88, 0.05);
+    armR.position.set(0.38, 0.88, 0.05);
     chairGroup.add(armR);
 
     scene.add(chairGroup);
   }
 
-  // --- WORKSTATION DESK ---
+  // --- WORKSTATION DESK (PROPORTIONAL COMFORTABLE HEIGHT) ---
   function buildWorkstationDesk() {
     const deskGroup = new THREE.Group();
 
-    // Tabletop
-    const topGeo = new THREE.BoxGeometry(4.4, 0.14, 2.2);
+    // Tabletop at comfortable y = 1.15 (surface y = 1.21)
+    const topGeo = new THREE.BoxGeometry(4.4, 0.12, 2.2);
     const topMat = new THREE.MeshStandardMaterial({ color: 0x181e2b, roughness: 0.35, metalness: 0.1 });
     const topMesh = new THREE.Mesh(topGeo, topMat);
-    topMesh.position.y = 1.35;
+    topMesh.position.y = 1.15;
     topMesh.castShadow = true;
     topMesh.receiveShadow = true;
     deskGroup.add(topMesh);
 
     // Desk Mat
-    const matGeo = new THREE.BoxGeometry(2.6, 0.01, 1.3);
-    const matMat = new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.8 });
-    const matMesh = new THREE.Mesh(matGeo, matMat);
-    matMesh.position.set(-0.2, 1.43, 0.15);
+    const matMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(2.6, 0.01, 1.3),
+      new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.8 })
+    );
+    matMesh.position.set(-0.2, 1.215, 0.15);
     matMesh.receiveShadow = true;
     deskGroup.add(matMesh);
 
-    // Metal Legs
-    const legGeo = new THREE.CylinderGeometry(0.06, 0.06, 1.35, 16);
+    // Legs
+    const legGeo = new THREE.CylinderGeometry(0.06, 0.06, 1.15, 16);
     const legMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.3 });
     [
-      [-2.0, 0.675, -0.9],
-      [2.0, 0.675, -0.9],
-      [-2.0, 0.675, 0.9],
-      [2.0, 0.675, 0.9]
+      [-2.0, 0.575, -0.9],
+      [2.0, 0.575, -0.9],
+      [-2.0, 0.575, 0.9],
+      [2.0, 0.575, 0.9]
     ].forEach(pos => {
       const leg = new THREE.Mesh(legGeo, legMat);
       leg.position.set(...pos);
@@ -570,25 +489,28 @@
       deskGroup.add(leg);
     });
 
-    // Ceramic Coffee Mug
-    const mugGeo = new THREE.CylinderGeometry(0.09, 0.08, 0.2, 16);
-    const mugMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.2 });
-    const mugMesh = new THREE.Mesh(mugGeo, mugMat);
-    mugMesh.position.set(-1.6, 1.52, -0.5);
+    // Coffee Mug
+    const mugMesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.09, 0.08, 0.2, 16),
+      new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.2 })
+    );
+    mugMesh.position.set(-1.6, 1.31, -0.5);
     mugMesh.castShadow = true;
     deskGroup.add(mugMesh);
 
-    // Succulent Pot
-    const potGeo = new THREE.CylinderGeometry(0.14, 0.1, 0.18, 16);
-    const potMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.8 });
-    const potMesh = new THREE.Mesh(potGeo, potMat);
-    potMesh.position.set(1.9, 1.52, -0.7);
+    // Succulent
+    const potMesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.14, 0.1, 0.18, 16),
+      new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.8 })
+    );
+    potMesh.position.set(1.9, 1.30, -0.7);
     deskGroup.add(potMesh);
 
-    const plantGeo = new THREE.DodecahedronGeometry(0.12, 1);
-    const plantMat = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.5 });
-    const plantMesh = new THREE.Mesh(plantGeo, plantMat);
-    plantMesh.position.set(1.9, 1.68, -0.7);
+    const plantMesh = new THREE.Mesh(
+      new THREE.DodecahedronGeometry(0.12, 1),
+      new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.5 })
+    );
+    plantMesh.position.set(1.9, 1.45, -0.7);
     deskGroup.add(plantMesh);
 
     scene.add(deskGroup);
@@ -598,89 +520,72 @@
   function buildComputer() {
     const pcGroup = new THREE.Group();
 
-    // Curved Monitor Stand Base
-    const standBaseGeo = new THREE.CylinderGeometry(0.24, 0.28, 0.03, 24);
     const metalMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.8, roughness: 0.2 });
-    const standBase = new THREE.Mesh(standBaseGeo, metalMat);
-    standBase.position.set(-0.2, 1.44, -0.55);
+    const standBase = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.28, 0.03, 24), metalMat);
+    standBase.position.set(-0.2, 1.225, -0.55);
     pcGroup.add(standBase);
 
-    // Stand Stem
-    const standStemGeo = new THREE.BoxGeometry(0.06, 0.55, 0.06);
-    const standStem = new THREE.Mesh(standStemGeo, metalMat);
-    standStem.position.set(-0.2, 1.72, -0.6);
+    const standStem = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.55, 0.06), metalMat);
+    standStem.position.set(-0.2, 1.50, -0.6);
     pcGroup.add(standStem);
 
-    // Monitor Bezel Frame
-    const bezelGeo = new THREE.BoxGeometry(2.1, 1.15, 0.08);
-    const bezelMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 });
-    const bezel = new THREE.Mesh(bezelGeo, bezelMat);
-    bezel.position.set(-0.2, 2.05, -0.55);
+    const bezel = new THREE.Mesh(
+      new THREE.BoxGeometry(2.1, 1.15, 0.08),
+      new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 })
+    );
+    bezel.position.set(-0.2, 1.82, -0.55);
     bezel.castShadow = true;
     pcGroup.add(bezel);
 
-    // Monitor Canvas
     monitorCanvas = document.createElement('canvas');
     monitorCanvas.width = 1024;
     monitorCanvas.height = 512;
     monitorCtx = monitorCanvas.getContext('2d');
     monitorTexture = new THREE.CanvasTexture(monitorCanvas);
 
-    const screenGeo = new THREE.PlaneGeometry(2.0, 1.05);
-    const screenMat = new THREE.MeshBasicMaterial({ map: monitorTexture });
-    monitorScreenMesh = new THREE.Mesh(screenGeo, screenMat);
-    monitorScreenMesh.position.set(-0.2, 2.05, -0.505);
+    monitorScreenMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(2.0, 1.05),
+      new THREE.MeshBasicMaterial({ map: monitorTexture })
+    );
+    monitorScreenMesh.position.set(-0.2, 1.82, -0.505);
     pcGroup.add(monitorScreenMesh);
 
-    // Mechanical Keyboard
-    const kbGeo = new THREE.BoxGeometry(1.2, 0.04, 0.42);
-    const kbMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 });
-    const keyboard = new THREE.Mesh(kbGeo, kbMat);
-    keyboard.position.set(-0.4, 1.45, 0.2);
+    // Keyboard & Mouse
+    const keyboard = new THREE.Mesh(
+      new THREE.BoxGeometry(1.2, 0.04, 0.42),
+      new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 })
+    );
+    keyboard.position.set(-0.4, 1.23, 0.2);
     keyboard.castShadow = true;
     pcGroup.add(keyboard);
 
-    // Keycaps Strip
-    const keycapsGeo = new THREE.BoxGeometry(1.1, 0.02, 0.35);
-    const keycapsMat = new THREE.MeshStandardMaterial({
-      color: 0x0ea5e9,
-      emissive: 0x0ea5e9,
-      emissiveIntensity: 0.35
-    });
-    const keycaps = new THREE.Mesh(keycapsGeo, keycapsMat);
-    keycaps.position.set(-0.4, 1.48, 0.2);
-    pcGroup.add(keycaps);
-
-    // Mouse
-    const mouseGeo = new THREE.BoxGeometry(0.14, 0.05, 0.22);
-    const mouseMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.3 });
-    const mouse = new THREE.Mesh(mouseGeo, mouseMat);
-    mouse.position.set(0.55, 1.45, 0.22);
+    const mouse = new THREE.Mesh(
+      new THREE.BoxGeometry(0.14, 0.05, 0.22),
+      new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.3 })
+    );
+    mouse.position.set(0.55, 1.23, 0.22);
     mouse.castShadow = true;
     pcGroup.add(mouse);
 
     scene.add(pcGroup);
   }
 
-  // --- 3D ROBLOX CHARACTER MODEL ---
+  // --- 3D ROBLOX CHARACTER ---
   function buildRobloxPlayer() {
     const pGroup = new THREE.Group();
     pGroup.position.copy(player.pos);
 
-    // Materials
-    const skinMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35 }); // Classic Roblox Yellow
-    const shirtMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.5 }); // Classic Cyan/Blue Shirt
-    const pantsMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 }); // Navy Pants
-    const capMat = new THREE.MeshStandardMaterial({ color: 0x0369a1, roughness: 0.4 });   // Roblox Cap
+    const skinMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35 });
+    const shirtMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.5 });
+    const pantsMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 });
+    const capMat = new THREE.MeshStandardMaterial({ color: 0x0369a1, roughness: 0.4 });
 
-    // 1. Torso
-    const torsoGeo = new THREE.BoxGeometry(0.42, 0.52, 0.24);
-    player.torso = new THREE.Mesh(torsoGeo, shirtMat);
+    // Torso
+    player.torso = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.52, 0.24), shirtMat);
     player.torso.position.y = 0.72;
     player.torso.castShadow = true;
     pGroup.add(player.torso);
 
-    // Roblox White Collar Detail
     const collar = new THREE.Mesh(
       new THREE.BoxGeometry(0.16, 0.08, 0.02),
       new THREE.MeshStandardMaterial({ color: 0xffffff })
@@ -688,16 +593,14 @@
     collar.position.set(0, 0.22, 0.125);
     player.torso.add(collar);
 
-    // 2. Head Group
+    // Head Group
     const headGroup = new THREE.Group();
     headGroup.position.set(0, 1.16, 0);
 
-    const headGeo = new THREE.BoxGeometry(0.32, 0.32, 0.30);
-    player.head = new THREE.Mesh(headGeo, skinMat);
+    player.head = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.32, 0.30), skinMat);
     player.head.castShadow = true;
     headGroup.add(player.head);
 
-    // Roblox Smiley Face (Eyes and Smile)
     const eyeGeo = new THREE.BoxGeometry(0.045, 0.045, 0.02);
     const blackMat = new THREE.MeshBasicMaterial({ color: 0x0a0a0a });
 
@@ -713,7 +616,6 @@
     smile.position.set(0, -0.06, 0.155);
     player.head.add(smile);
 
-    // Roblox Baseball Cap
     const capCrown = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.09, 0.34), capMat);
     capCrown.position.set(0, 0.16, 0);
     player.head.add(capCrown);
@@ -724,37 +626,33 @@
 
     pGroup.add(headGroup);
 
-    // 3. Left Arm
+    // Arms
     const armGeo = new THREE.BoxGeometry(0.14, 0.44, 0.14);
     player.leftArm = new THREE.Mesh(armGeo, shirtMat);
     player.leftArm.position.set(-0.29, 0.68, 0);
     player.leftArm.castShadow = true;
     pGroup.add(player.leftArm);
 
-    // Yellow Hand for Left Arm
     const handL = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.12, 0.13), skinMat);
     handL.position.set(0, -0.22, 0);
     player.leftArm.add(handL);
 
-    // 4. Right Arm
     player.rightArm = new THREE.Mesh(armGeo, shirtMat);
     player.rightArm.position.set(0.29, 0.68, 0);
     player.rightArm.castShadow = true;
     pGroup.add(player.rightArm);
 
-    // Yellow Hand for Right Arm
     const handR = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.12, 0.13), skinMat);
     handR.position.set(0, -0.22, 0);
     player.rightArm.add(handR);
 
-    // 5. Left Leg
+    // Legs
     const legGeo = new THREE.BoxGeometry(0.16, 0.46, 0.16);
     player.leftLeg = new THREE.Mesh(legGeo, pantsMat);
     player.leftLeg.position.set(-0.11, 0.23, 0);
     player.leftLeg.castShadow = true;
     pGroup.add(player.leftLeg);
 
-    // 6. Right Leg
     player.rightLeg = new THREE.Mesh(legGeo, pantsMat);
     player.rightLeg.position.set(0.11, 0.23, 0);
     player.rightLeg.castShadow = true;
@@ -764,108 +662,81 @@
     scene.add(pGroup);
   }
 
-  // --- DYNAMIC MONITOR & HOLOGRAM CANVAS ---
+  // --- DYNAMIC MONITOR & HOLOGRAM CANVAS (ANTI-SLOP TEXT) ---
   function updateMonitor(status, detail) {
     if (!monitorCtx) return;
     const ctx = monitorCtx;
-    const w = 1024;
-    const h = 512;
+    const w = 1024, h = 512;
 
-    const grad = ctx.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, '#090d16');
-    grad.addColorStop(1, '#0f172a');
-    ctx.fillStyle = grad;
+    ctx.fillStyle = '#090d16';
     ctx.fillRect(0, 0, w, h);
 
-    // Grid pattern
-    ctx.strokeStyle = 'rgba(56, 189, 248, 0.08)';
-    ctx.lineWidth = 1;
-    for (let x = 0; x < w; x += 40) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, h);
-      ctx.stroke();
-    }
-    for (let y = 0; y < h; y += 40) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(w, y);
-      ctx.stroke();
-    }
-
-    // Top Header Bar
+    // Clean border & header
     ctx.fillStyle = '#1e293b';
-    ctx.fillRect(0, 0, w, 60);
-
-    ctx.fillStyle = '#38bdf8';
-    ctx.font = 'bold 22px "Courier New", monospace';
-    ctx.fillText('⚡ ROBLOX PAYROLL ENGINE // TUGAS 3 ALGO & PEMROGRAMAN', 28, 38);
-
-    const isSuccess = status === 'SUCCESS';
-    const pillColor = isSuccess ? '#10b981' : (status === 'CALCULATING' ? '#f59e0b' : '#38bdf8');
-    ctx.fillStyle = pillColor;
-    ctx.beginPath();
-    ctx.arc(w - 180, 32, 7, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillRect(0, 0, w, 56);
 
     ctx.fillStyle = '#f8fafc';
-    ctx.font = 'bold 18px "Courier New", monospace';
-    ctx.fillText(status, w - 160, 38);
+    ctx.font = '600 20px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    ctx.fillText('Penghasilan Karyawan', 24, 36);
 
-    // Main Box
-    ctx.fillStyle = 'rgba(30, 41, 59, 0.7)';
-    ctx.strokeStyle = pillColor;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.roundRect(30, 90, w - 60, 160, 12);
-    ctx.fill();
-    ctx.stroke();
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = '500 16px monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(status, w - 24, 36);
+    ctx.textAlign = 'start';
+
+    // Status message box
+    ctx.fillStyle = '#0f172a';
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(24, 76, w - 48, 140);
+    ctx.fillRect(24, 76, w - 48, 140);
 
     ctx.fillStyle = '#94a3b8';
-    ctx.font = '18px "Segoe UI", sans-serif';
-    ctx.fillText('STATUS SISTEM PERHITUNGAN:', 55, 130);
+    ctx.font = '15px -apple-system, sans-serif';
+    ctx.fillText('Status:', 44, 115);
 
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 30px "Segoe UI", sans-serif';
-    ctx.fillText(detail || 'Menunggu input dari formulir...', 55, 175);
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = '600 26px -apple-system, sans-serif';
+    ctx.fillText(detail || 'Menunggu input...', 44, 160);
 
     // Array Tables
-    drawArrayCard(ctx, 30, 290, 460, 180, 'ARRAY_GAJI [double]', [
+    drawArrayCard(ctx, 24, 236, 476, 240, 'ARRAY_GAJI', [
       'Indeks 0: Rp 5.000.000 (Gol A)',
       'Indeks 1: Rp 6.500.000 (Gol B)',
       'Indeks 2: Rp 9.500.000 (Gol C)'
     ], currentGrade === 'A' ? 0 : (currentGrade === 'B' ? 1 : 2));
 
-    drawArrayCard(ctx, 534, 290, 460, 180, 'ARRAY_LEMBUR [double]', [
-      'Idx 0: 30% (1j)  |  Idx 1: 32% (2j)',
-      'Idx 2: 34% (3j)  |  Idx 3: 36% (4j)',
-      'Idx 4: 38% (≥5j) |  Default: 0%'
+    drawArrayCard(ctx, 524, 236, 476, 240, 'ARRAY_LEMBUR', [
+      'Indeks 0: 30% (1 jam)',
+      'Indeks 1: 32% (2 jam)',
+      'Indeks 2: 34% (3 jam)',
+      'Indeks 3: 36% (4 jam)',
+      'Indeks 4: 38% (≥5 jam)'
     ], -1);
 
     monitorTexture.needsUpdate = true;
   }
 
   function drawArrayCard(ctx, x, y, w, h, title, lines, activeIdx) {
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-    ctx.strokeStyle = 'rgba(148, 163, 184, 0.2)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.roundRect(x, y, w, h, 8);
-    ctx.fill();
-    ctx.stroke();
+    ctx.fillStyle = '#0f172a';
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x, y, w, h);
+    ctx.fillRect(x, y, w, h);
 
     ctx.fillStyle = '#38bdf8';
-    ctx.font = 'bold 16px "Courier New", monospace';
-    ctx.fillText(title, x + 20, y + 30);
+    ctx.font = '600 15px monospace';
+    ctx.fillText(title, x + 18, y + 32);
 
-    ctx.font = '15px "Courier New", monospace';
+    ctx.font = '14px monospace';
     lines.forEach((line, i) => {
       if (i === activeIdx) {
-        ctx.fillStyle = '#fef08a';
-        ctx.fillText('▶ ' + line, x + 20, y + 68 + i * 28);
+        ctx.fillStyle = '#34d399';
+        ctx.fillText('• ' + line, x + 18, y + 68 + i * 32);
       } else {
         ctx.fillStyle = '#94a3b8';
-        ctx.fillText('  ' + line, x + 20, y + 68 + i * 28);
+        ctx.fillText('  ' + line, x + 18, y + 68 + i * 32);
       }
     });
   }
@@ -873,22 +744,24 @@
   // --- ID BADGE ---
   function buildIdBadge() {
     const badgeGroup = new THREE.Group();
-    const standGeo = new THREE.CylinderGeometry(0.18, 0.22, 0.04, 20);
-    const standMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.9, roughness: 0.2 });
-    const stand = new THREE.Mesh(standGeo, standMat);
-    stand.position.set(-1.4, 1.44, 0.4);
+    const stand = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.18, 0.22, 0.04, 20),
+      new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.9, roughness: 0.2 })
+    );
+    stand.position.set(-1.4, 1.225, 0.4);
     badgeGroup.add(stand);
 
-    const cardGeo = new THREE.BoxGeometry(0.55, 0.85, 0.02);
     idBadgeCanvas = document.createElement('canvas');
     idBadgeCanvas.width = 512;
     idBadgeCanvas.height = 768;
     idBadgeCtx = idBadgeCanvas.getContext('2d');
     idBadgeTexture = new THREE.CanvasTexture(idBadgeCanvas);
 
-    const cardMat = new THREE.MeshStandardMaterial({ map: idBadgeTexture, roughness: 0.25 });
-    idBadgeMesh = new THREE.Mesh(cardGeo, cardMat);
-    idBadgeMesh.position.set(-1.4, 1.88, 0.4);
+    idBadgeMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(0.55, 0.85, 0.02),
+      new THREE.MeshStandardMaterial({ map: idBadgeTexture, roughness: 0.25 })
+    );
+    idBadgeMesh.position.set(-1.4, 1.66, 0.4);
     idBadgeMesh.rotation.y = 0.35;
     idBadgeMesh.castShadow = true;
     badgeGroup.add(idBadgeMesh);
@@ -899,63 +772,47 @@
   function updateIdBadge(grade, salary) {
     if (!idBadgeCtx) return;
     const ctx = idBadgeCtx;
-    const w = 512;
-    const h = 768;
+    const w = 512, h = 768;
     const cfg = GRADE_CONFIG[grade] || GRADE_CONFIG['A'];
 
     ctx.fillStyle = '#0f172a';
     ctx.fillRect(0, 0, w, h);
 
     ctx.fillStyle = cfg.color;
-    ctx.fillRect(0, 0, w, 150);
+    ctx.fillRect(0, 0, w, 130);
 
     ctx.fillStyle = '#090d16';
-    ctx.beginPath();
-    ctx.roundRect(w / 2 - 40, 20, 80, 16, 8);
-    ctx.fill();
-
-    ctx.fillStyle = '#090d16';
-    ctx.font = 'bold 28px "Segoe UI", sans-serif';
+    ctx.font = '700 24px -apple-system, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('EMPLOYEE BADGE', w / 2, 95);
-    ctx.font = '18px "Courier New", monospace';
-    ctx.fillText('ROBLOX CORP // TUGAS 3', w / 2, 125);
+    ctx.fillText('ID KARYAWAN', w / 2, 75);
 
     ctx.fillStyle = '#1e293b';
     ctx.beginPath();
-    ctx.arc(w / 2, 270, 85, 0, Math.PI * 2);
+    ctx.arc(w / 2, 260, 80, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = cfg.color;
-    ctx.lineWidth = 6;
-    ctx.stroke();
 
     ctx.fillStyle = cfg.color;
-    ctx.font = 'bold 95px "Segoe UI", sans-serif';
-    ctx.fillText(grade, w / 2, 305);
+    ctx.font = '700 90px -apple-system, sans-serif';
+    ctx.fillText(grade, w / 2, 292);
 
     ctx.fillStyle = '#f8fafc';
-    ctx.font = 'bold 32px "Segoe UI", sans-serif';
-    ctx.fillText(cfg.name, w / 2, 400);
+    ctx.font = '600 30px -apple-system, sans-serif';
+    ctx.fillText(cfg.name, w / 2, 385);
 
     ctx.fillStyle = '#94a3b8';
-    ctx.font = '22px "Courier New", monospace';
-    ctx.fillText(`Array Index: [${cfg.index}]`, w / 2, 440);
+    ctx.font = '18px monospace';
+    ctx.fillText(`Indeks [${cfg.index}]`, w / 2, 425);
 
-    ctx.fillStyle = 'rgba(30, 41, 59, 0.9)';
-    ctx.beginPath();
-    ctx.roundRect(40, 480, w - 80, 120, 16);
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(40, 480, w - 80, 110);
 
     ctx.fillStyle = '#94a3b8';
-    ctx.font = '18px "Segoe UI", sans-serif';
-    ctx.fillText('GAJI POKOK RESMI', w / 2, 518);
+    ctx.font = '16px -apple-system, sans-serif';
+    ctx.fillText('Gaji Pokok', w / 2, 515);
 
     ctx.fillStyle = '#34d399';
-    ctx.font = 'bold 30px "Segoe UI", sans-serif';
-    ctx.fillText('Rp ' + Number(salary).toLocaleString('id-ID'), w / 2, 565);
+    ctx.font = '700 28px -apple-system, sans-serif';
+    ctx.fillText('Rp ' + Number(salary).toLocaleString('id-ID'), w / 2, 558);
 
     ctx.textAlign = 'start';
     idBadgeTexture.needsUpdate = true;
@@ -969,18 +826,18 @@
     hologramCtx = hologramCanvas.getContext('2d');
     hologramTexture = new THREE.CanvasTexture(hologramCanvas);
 
-    const geo = new THREE.PlaneGeometry(1.6, 2.13);
-    const mat = new THREE.MeshStandardMaterial({
-      map: hologramTexture,
-      transparent: true,
-      opacity: 0.92,
-      roughness: 0.1,
-      metalness: 0.3,
-      side: THREE.DoubleSide
-    });
-
-    hologramMesh = new THREE.Mesh(geo, mat);
-    hologramMesh.position.set(1.4, 2.5, 0.6);
+    hologramMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.6, 2.13),
+      new THREE.MeshStandardMaterial({
+        map: hologramTexture,
+        transparent: true,
+        opacity: 0.92,
+        roughness: 0.1,
+        metalness: 0.3,
+        side: THREE.DoubleSide
+      })
+    );
+    hologramMesh.position.set(1.4, 2.15, 0.6);
     hologramMesh.rotation.y = -0.4;
     hologramMesh.rotation.x = -0.05;
     scene.add(hologramMesh);
@@ -989,105 +846,70 @@
   function updateHologramSlip(data) {
     if (!hologramCtx) return;
     const ctx = hologramCtx;
-    const w = 720;
-    const h = 960;
+    const w = 720, h = 960;
 
     ctx.clearRect(0, 0, w, h);
 
-    ctx.fillStyle = 'rgba(11, 17, 32, 0.88)';
+    ctx.fillStyle = 'rgba(11, 17, 32, 0.92)';
     ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 6;
-    ctx.beginPath();
-    ctx.roundRect(10, 10, w - 20, h - 20, 24);
-    ctx.fill();
-    ctx.stroke();
+    ctx.lineWidth = 3;
+    ctx.strokeRect(16, 16, w - 32, h - 32);
+    ctx.fillRect(16, 16, w - 32, h - 32);
 
-    const barGrad = ctx.createLinearGradient(0, 0, w, 0);
-    barGrad.addColorStop(0, '#0284c7');
-    barGrad.addColorStop(1, '#06b6d4');
-    ctx.fillStyle = barGrad;
-    ctx.beginPath();
-    ctx.roundRect(20, 20, w - 40, 90, [18, 18, 4, 4]);
-    ctx.fill();
+    ctx.fillStyle = '#0284c7';
+    ctx.fillRect(20, 20, w - 40, 80);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 32px "Segoe UI", sans-serif';
+    ctx.font = '700 28px -apple-system, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('SLIP GAJI ELEKTRONIK', w / 2, 65);
-    ctx.font = '16px "Courier New", monospace';
-    ctx.fillText('SISTEM PENGHASILAN KARYAWAN', w / 2, 95);
+    ctx.fillText('SLIP GAJI', w / 2, 70);
 
     ctx.textAlign = 'start';
-    let y = 170;
-    const leftX = 50;
-    const rightX = w - 50;
+    let y = 160;
+    const leftX = 50, rightX = w - 50;
 
-    function drawSlipRow(label, value, subtext, isBold) {
+    function drawSlipRow(label, value, isBold) {
       ctx.fillStyle = '#94a3b8';
-      ctx.font = isBold ? 'bold 22px "Segoe UI", sans-serif' : '20px "Segoe UI", sans-serif';
+      ctx.font = isBold ? '600 22px -apple-system, sans-serif' : '20px -apple-system, sans-serif';
       ctx.fillText(label, leftX, y);
 
       ctx.fillStyle = isBold ? '#38bdf8' : '#f8fafc';
       ctx.textAlign = 'right';
-      ctx.font = isBold ? 'bold 24px "Segoe UI", sans-serif' : '22px "Segoe UI", sans-serif';
+      ctx.font = isBold ? '700 24px -apple-system, sans-serif' : '20px -apple-system, sans-serif';
       ctx.fillText(value, rightX, y);
 
-      if (subtext) {
-        ctx.fillStyle = '#64748b';
-        ctx.font = '15px "Courier New", monospace';
-        ctx.fillText(subtext, rightX, y + 24);
-        y += 20;
-      }
-
       ctx.textAlign = 'start';
-      y += 50;
+      y += 56;
 
       ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(leftX, y - 25);
-      ctx.lineTo(rightX, y - 25);
+      ctx.moveTo(leftX, y - 24);
+      ctx.lineTo(rightX, y - 24);
       ctx.stroke();
     }
 
-    drawSlipRow('Golongan Karyawan', `Golongan ${data.golongan}`, `ARRAY_GAJI[${data.golongan === 'A' ? 0 : data.golongan === 'B' ? 1 : 2}]`, true);
-    drawSlipRow('Gaji Pokok', 'Rp ' + Number(data.gajiPokok).toLocaleString('id-ID'), null, false);
-    drawSlipRow('Durasi Lembur', `${data.jamLembur} Jam`, null, false);
-    drawSlipRow('Persentase Lembur', `${data.persenLembur}%`, `ARRAY_LEMBUR (${data.persenLembur}%)`, false);
-    drawSlipRow('Nominal Uang Lembur', 'Rp ' + Number(data.gajiLembur).toLocaleString('id-ID'), 'Rumus: % Lembur × Gaji Pokok', false);
+    drawSlipRow('Golongan', `Golongan ${data.golongan}`, true);
+    drawSlipRow('Gaji Pokok', 'Rp ' + Number(data.gajiPokok).toLocaleString('id-ID'), false);
+    drawSlipRow('Jam Lembur', `${data.jamLembur} Jam`, false);
+    drawSlipRow('Persentase', `${data.persenLembur}%`, false);
+    drawSlipRow('Uang Lembur', 'Rp ' + Number(data.gajiLembur).toLocaleString('id-ID'), false);
 
-    y += 10;
+    // Total Box
+    y += 16;
     ctx.fillStyle = 'rgba(16, 185, 129, 0.12)';
     ctx.strokeStyle = '#10b981';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.roundRect(40, y, w - 80, 130, 16);
-    ctx.fill();
-    ctx.stroke();
+    ctx.lineWidth = 2;
+    ctx.strokeRect(40, y, w - 80, 110);
+    ctx.fillRect(40, y, w - 80, 110);
 
     ctx.fillStyle = '#34d399';
-    ctx.font = 'bold 20px "Segoe UI", sans-serif';
-    ctx.fillText('TOTAL PENGHASILAN BERSIH', 60, y + 40);
+    ctx.font = '600 18px -apple-system, sans-serif';
+    ctx.fillText('Total Penghasilan', 60, y + 38);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 38px "Segoe UI", sans-serif';
-    ctx.fillText('Rp ' + Number(data.totalPenghasilan).toLocaleString('id-ID'), 60, y + 95);
-
-    // Stamp
-    ctx.save();
-    ctx.translate(w - 180, y + 175);
-    ctx.rotate(-0.15);
-    ctx.strokeStyle = '#10b981';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(-110, -35, 220, 65);
-
-    ctx.fillStyle = '#10b981';
-    ctx.font = 'bold 22px "Courier New", monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('✓ TERVERIFIKASI', 0, -4);
-    ctx.font = '12px "Courier New", monospace';
-    ctx.fillText('LOGIKA ARRAY JAVA OK', 0, 18);
-    ctx.restore();
+    ctx.font = '700 36px -apple-system, sans-serif';
+    ctx.fillText('Rp ' + Number(data.totalPenghasilan).toLocaleString('id-ID'), 60, y + 84);
 
     hologramTexture.needsUpdate = true;
   }
@@ -1095,7 +917,7 @@
   // --- MONEY STACKS ---
   function buildMoneyGroup() {
     moneyGroup = new THREE.Group();
-    moneyGroup.position.set(0.6, 1.43, 0.35);
+    moneyGroup.position.set(0.6, 1.215, 0.35);
     scene.add(moneyGroup);
   }
 
@@ -1116,16 +938,15 @@
     ctx.fillRect(200, 0, 112, 256);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 44px "Segoe UI", sans-serif';
+    ctx.font = '700 40px -apple-system, sans-serif';
     ctx.fillText('INDONESIA', 30, 70);
-    ctx.font = 'bold 36px "Segoe UI", sans-serif';
+    ctx.font = '700 36px -apple-system, sans-serif';
     ctx.fillText(label, 30, 210);
 
     ctx.fillStyle = '#0f172a';
-    ctx.font = 'bold 20px "Courier New", monospace';
+    ctx.font = '600 20px monospace';
     ctx.textAlign = 'center';
     ctx.fillText('BANKNOTE', 256, 130);
-    ctx.fillText('100 PCS', 256, 160);
 
     return new THREE.CanvasTexture(canvas);
   }
@@ -1149,8 +970,7 @@
 
     let index = 0;
     const cols = 2;
-    const spacingX = 0.56;
-    const spacingZ = 0.34;
+    const spacingX = 0.56, spacingZ = 0.34;
 
     function addStack(col, row, heightIdx, mat) {
       const mesh = new THREE.Mesh(stackGeo, mat);
@@ -1158,13 +978,13 @@
       const targetZ = (row - 0.5) * spacingZ;
       const targetY = heightIdx * 0.085;
 
-      mesh.position.set(targetX, targetY + 1.2 + Math.random() * 0.5, targetZ);
+      mesh.position.set(targetX, targetY + 1.0 + Math.random() * 0.4, targetZ);
       mesh.rotation.y = (Math.random() - 0.5) * 0.12;
       mesh.castShadow = true;
       moneyGroup.add(mesh);
 
       const startY = mesh.position.y;
-      const startTime = performance.now() + index * 45;
+      const startTime = performance.now() + index * 40;
       index++;
 
       const dropAnim = (now) => {
@@ -1172,7 +992,7 @@
           requestAnimationFrame(dropAnim);
           return;
         }
-        const progress = Math.min((now - startTime) / 360, 1);
+        const progress = Math.min((now - startTime) / 340, 1);
         mesh.position.y = startY + (targetY - startY) * easeOutBounce(progress);
         if (progress < 1) requestAnimationFrame(dropAnim);
       };
@@ -1200,35 +1020,32 @@
     }
   }
 
-  // --- CELEBRATION COINS ---
   function triggerCelebration() {
     const coinGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.02, 12);
     const coinMat = new THREE.MeshStandardMaterial({
       color: 0xf59e0b,
       metalness: 0.9,
-      roughness: 0.2,
-      emissive: 0xd97706,
-      emissiveIntensity: 0.25
+      roughness: 0.2
     });
 
-    const spawnOrigin = new THREE.Vector3(0.6, 1.8, 0.4);
+    const spawnOrigin = new THREE.Vector3(0.6, 1.5, 0.4);
 
-    for (let i = 0; i < 35; i++) {
+    for (let i = 0; i < 25; i++) {
       const coin = new THREE.Mesh(coinGeo, coinMat);
       coin.position.copy(spawnOrigin);
       coin.position.x += (Math.random() - 0.5) * 0.4;
       coin.position.z += (Math.random() - 0.5) * 0.4;
 
       const velocity = new THREE.Vector3(
-        (Math.random() - 0.5) * 2.8,
-        Math.random() * 3.5 + 2.0,
-        (Math.random() - 0.5) * 2.8
+        (Math.random() - 0.5) * 2.4,
+        Math.random() * 3.0 + 1.8,
+        (Math.random() - 0.5) * 2.4
       );
 
       const rotSpeed = new THREE.Vector3(
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 10
+        (Math.random() - 0.5) * 8,
+        (Math.random() - 0.5) * 8,
+        (Math.random() - 0.5) * 8
       );
 
       scene.add(coin);
@@ -1238,7 +1055,7 @@
 
   function updateCoinParticles(delta) {
     const gravity = -9.8;
-    const floorY = 1.43;
+    const floorY = 1.22;
 
     for (let i = coinParticles.length - 1; i >= 0; i--) {
       const p = coinParticles[i];
@@ -1250,12 +1067,12 @@
 
       if (p.mesh.position.y <= floorY) {
         p.mesh.position.y = floorY;
-        p.velocity.y = -p.velocity.y * 0.4;
+        p.velocity.y = -p.velocity.y * 0.35;
         p.velocity.x *= 0.7;
         p.velocity.z *= 0.7;
       }
 
-      if (performance.now() - p.birth > 3500) {
+      if (performance.now() - p.birth > 3000) {
         scene.remove(p.mesh);
         p.mesh.geometry.dispose();
         coinParticles.splice(i, 1);
@@ -1265,18 +1082,18 @@
 
   // --- STEAM PARTICLES ---
   function buildSteamParticles() {
-    const particleCount = 18;
+    const count = 15;
     const geo = new THREE.BufferGeometry();
-    const positions = new Float32Array(particleCount * 3);
+    const positions = new Float32Array(count * 3);
 
-    for (let i = 0; i < particleCount; i++) {
+    for (let i = 0; i < count; i++) {
       positions[i * 3] = -1.6 + (Math.random() - 0.5) * 0.08;
-      positions[i * 3 + 1] = 1.62 + Math.random() * 0.4;
+      positions[i * 3 + 1] = 1.41 + Math.random() * 0.4;
       positions[i * 3 + 2] = -0.5 + (Math.random() - 0.5) * 0.08;
     }
 
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.04, transparent: true, opacity: 0.35 });
+    const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.04, transparent: true, opacity: 0.3 });
     steamParticles = new THREE.Points(geo, mat);
     scene.add(steamParticles);
   }
@@ -1285,10 +1102,10 @@
     if (!steamParticles) return;
     const pos = steamParticles.geometry.attributes.position.array;
     for (let i = 0; i < pos.length; i += 3) {
-      pos[i + 1] += delta * 0.25;
+      pos[i + 1] += delta * 0.22;
       pos[i] += Math.sin(pos[i + 1] * 10) * 0.001;
-      if (pos[i + 1] > 2.1) {
-        pos[i + 1] = 1.62;
+      if (pos[i + 1] > 1.9) {
+        pos[i + 1] = 1.41;
         pos[i] = -1.6 + (Math.random() - 0.5) * 0.08;
         pos[i + 2] = -0.5 + (Math.random() - 0.5) * 0.08;
       }
@@ -1305,11 +1122,16 @@
     else return n1 * (x -= 2.625 / d1) * x + 0.984375;
   }
 
-  // --- INPUT & POINTER LOCK CONTROLS ---
+  // --- INPUT CONTROLS ---
+  function clampPitch() {
+    const maxPitch = player.isSitting ? Math.PI / 3.0 : Math.PI / 2.3;
+    const minPitch = player.isSitting ? -Math.PI / 2.8 : -Math.PI / 2.3;
+    cameraPitch = Math.max(minPitch, Math.min(maxPitch, cameraPitch));
+  }
+
   function setupInputControls() {
     const canvas = renderer.domElement;
 
-    // Pointer Lock click on canvas
     canvas.addEventListener('click', () => {
       if (!player.isSitting) {
         canvas.requestPointerLock();
@@ -1324,21 +1146,46 @@
       }
     });
 
-    // Mouse Look
-    document.addEventListener('mousemove', (e) => {
-      if (!isPointerLocked || player.isSitting) return;
-      const sensitivity = 0.0024;
-      cameraYaw -= e.movementX * sensitivity;
-      cameraPitch -= e.movementY * sensitivity;
-
-      // Clamp vertical pitch (prevent flipping)
-      const maxPitch = Math.PI / 2.3;
-      cameraPitch = Math.max(-maxPitch, Math.min(maxPitch, cameraPitch));
+    canvas.addEventListener('mousedown', (e) => {
+      if (!isPointerLocked) {
+        isDraggingCanvas = true;
+        previousMousePos = { x: e.clientX, y: e.clientY };
+      }
     });
 
-    // Keyboard Listeners
+    window.addEventListener('mouseup', () => {
+      isDraggingCanvas = false;
+    });
+
+    // Mouse Wheel Zoom in Seated Mode (Bounded at current POV)
+    canvas.addEventListener('wheel', (e) => {
+      if (player.isSitting) {
+        e.preventDefault();
+        // Scroll up (deltaY < 0) = zoom in, Scroll down (deltaY > 0) = zoom out
+        const zoomDelta = -e.deltaY * 0.0018;
+        targetSeatedZoom = Math.max(0, Math.min(1, targetSeatedZoom + zoomDelta));
+      }
+    }, { passive: false });
+
+    window.addEventListener('mousemove', (e) => {
+      if (isPointerLocked) {
+        const sensitivity = 0.0024;
+        cameraYaw -= e.movementX * sensitivity;
+        cameraPitch -= e.movementY * sensitivity;
+        clampPitch();
+      } else if (isDraggingCanvas) {
+        const deltaX = e.clientX - previousMousePos.x;
+        const deltaY = e.clientY - previousMousePos.y;
+        previousMousePos = { x: e.clientX, y: e.clientY };
+
+        const sensitivity = 0.004;
+        cameraYaw -= deltaX * sensitivity;
+        cameraPitch -= deltaY * sensitivity;
+        clampPitch();
+      }
+    });
+
     window.addEventListener('keydown', (e) => {
-      // Don't intercept typing if user is typing into input fields
       if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT')) {
         if (e.code === 'Escape') {
           document.activeElement.blur();
@@ -1424,36 +1271,44 @@
   }
 
   function togglePovMode() {
-    if (player.isSitting) return;
     povMode = povMode === 'FPS' ? 'THIRD_PERSON' : 'FPS';
     const tag = document.getElementById('pov-mode-text');
     if (tag) {
-      tag.textContent = povMode === 'FPS' ? 'POV: 1st Person (Mata)' : 'POV: 3rd Person (Roblox)';
+      tag.textContent = povMode === 'FPS' ? '1st Person' : '3rd Person';
     }
   }
 
-  // --- SITTING & STANDING LOGIC ---
+  // --- SITTING & STANDING (TALL ELEVATED SEATED POV) ---
   function sitDownAtChair() {
     player.isSitting = true;
-    povMode = 'SEATED';
     document.exitPointerLock();
 
-    // Move player model into chair
-    player.pos.set(chairPos.x, 0.42, chairPos.z - 0.22);
+    // Reset zoom state to default POV
+    targetSeatedZoom = 0;
+    seatedZoom = 0;
+    if (camera) {
+      camera.fov = 65;
+      camera.updateProjectionMatrix();
+    }
+
+    // Position player body neatly in chair
+    player.pos.set(chairPos.x, 0.55, chairPos.z - 0.05);
     if (player.meshGroup) {
       player.meshGroup.position.copy(player.pos);
-      player.meshGroup.rotation.y = Math.PI; // Face desk
+      player.meshGroup.rotation.y = Math.PI;
 
-      // Sitting pose: legs bent forward, arms forward
       player.leftLeg.rotation.x = -Math.PI / 2;
       player.rightLeg.rotation.x = -Math.PI / 2;
       player.leftArm.rotation.x = -0.55;
       player.rightArm.rotation.x = -0.55;
     }
 
+    // Camera initial orientation when sitting
+    cameraYaw = Math.PI;
+    cameraPitch = -0.15; // Natural downward glance at keyboard & monitor
+
     SoundFX.sit();
 
-    // Notify UI to open calculator drawer
     const prompt = document.getElementById('interaction-prompt');
     if (prompt) prompt.classList.remove('visible');
 
@@ -1467,17 +1322,27 @@
   function standUp() {
     if (!player.isSitting) return;
     player.isSitting = false;
-    povMode = 'FPS';
 
-    // Move player back slightly behind chair
+    // Reset zoom state
+    targetSeatedZoom = 0;
+    seatedZoom = 0;
+    if (camera) {
+      camera.fov = 65;
+      camera.updateProjectionMatrix();
+    }
+
     player.pos.set(chairPos.x, 0, chairPos.z + 1.2);
     if (player.meshGroup) {
       player.meshGroup.position.copy(player.pos);
+      player.meshGroup.rotation.y = Math.PI;
       player.leftLeg.rotation.x = 0;
       player.rightLeg.rotation.x = 0;
       player.leftArm.rotation.x = 0;
       player.rightArm.rotation.x = 0;
     }
+
+    cameraYaw = Math.PI;
+    cameraPitch = -0.06;
 
     SoundFX.stand();
 
@@ -1488,35 +1353,32 @@
     if (terminalDrawer) terminalDrawer.classList.remove('open');
   }
 
-  // --- PLAYER MOVEMENT & COLLISION ---
+  // --- PLAYER MOVEMENT (POV-BASED) ---
   function updatePlayerPhysics(delta) {
     if (player.isSitting) return;
 
-    // Movement Direction
-    const inputX = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
-    const inputZ = (keys.backward ? 1 : 0) - (keys.forward ? 1 : 0);
-    const isMoving = inputX !== 0 || inputZ !== 0;
+    const fx = Math.sin(cameraYaw);
+    const fz = Math.cos(cameraYaw);
+    const forward = new THREE.Vector3(fx, 0, fz).normalize();
+    const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
 
+    const moveDir = new THREE.Vector3();
+    if (keys.forward)  moveDir.add(forward);
+    if (keys.backward) moveDir.sub(forward);
+    if (keys.right)    moveDir.add(right);
+    if (keys.left)     moveDir.sub(right);
+
+    const isMoving = moveDir.lengthSq() > 0.0001;
     const currentSpeed = keys.sprint ? player.sprintSpeed : player.speed;
 
     if (isMoving) {
-      // Calculate movement vector aligned with camera yaw
-      const forward = new THREE.Vector3(Math.sin(cameraYaw), 0, Math.cos(cameraYaw));
-      const right = new THREE.Vector3(-Math.cos(cameraYaw), 0, Math.sin(cameraYaw));
-
-      const moveDir = new THREE.Vector3()
-        .addScaledVector(forward, inputZ)
-        .addScaledVector(right, inputX)
-        .normalize();
-
+      moveDir.normalize();
       const moveDist = currentSpeed * delta;
       const targetPos = player.pos.clone().addScaledVector(moveDir, moveDist);
 
-      // Room Boundaries [-6.5, 6.5]
       targetPos.x = Math.max(-6.5, Math.min(6.5, targetPos.x));
       targetPos.z = Math.max(-6.5, Math.min(6.5, targetPos.z));
 
-      // Obstacle Collision (AABB)
       let canMove = true;
       for (const col of colliders) {
         if (
@@ -1534,26 +1396,22 @@
         player.pos.copy(targetPos);
       }
 
-      // Step sound & walking animation
       SoundFX.step();
       player.walkTime += delta * (keys.sprint ? 14 : 9);
 
       if (player.leftArm && player.rightArm && player.leftLeg && player.rightLeg) {
-        const armAmp = 0.65;
-        const legAmp = 0.75;
+        const armAmp = 0.65, legAmp = 0.75;
         player.leftArm.rotation.x = Math.sin(player.walkTime) * armAmp;
         player.rightArm.rotation.x = -Math.sin(player.walkTime) * armAmp;
         player.leftLeg.rotation.x = -Math.sin(player.walkTime) * legAmp;
         player.rightLeg.rotation.x = Math.sin(player.walkTime) * legAmp;
       }
 
-      // Rotate player model towards moving direction (in 3rd person)
       if (player.meshGroup) {
         const lookAngle = Math.atan2(moveDir.x, moveDir.z);
         player.meshGroup.rotation.y = THREE.MathUtils.lerp(player.meshGroup.rotation.y, lookAngle, 0.2);
       }
     } else {
-      // Idle return arms/legs to neutral
       if (player.leftArm && player.rightArm && player.leftLeg && player.rightLeg) {
         player.leftArm.rotation.x = THREE.MathUtils.lerp(player.leftArm.rotation.x, 0, 0.15);
         player.rightArm.rotation.x = THREE.MathUtils.lerp(player.rightArm.rotation.x, 0, 0.15);
@@ -1562,7 +1420,6 @@
       }
     }
 
-    // Gravity & Jump Physics
     const gravity = -14.0;
     player.vel.y += gravity * delta;
     player.pos.y += player.vel.y * delta;
@@ -1573,12 +1430,10 @@
       player.isGrounded = true;
     }
 
-    // Update Player Mesh Position
     if (player.meshGroup) {
       player.meshGroup.position.copy(player.pos);
     }
 
-    // Check Distance to Chair for Prompt
     const distToChair = player.pos.distanceTo(chairPos);
     isNearChair = distToChair < CHAIR_INTERACTION_DIST;
     const prompt = document.getElementById('interaction-prompt');
@@ -1587,19 +1442,64 @@
     }
   }
 
-  // --- CAMERA UPDATE ---
+  // --- CAMERA UPDATE (TALL, UNCLIPPED SEATED POV WITH WHEEL ZOOM) ---
   function updateCamera() {
-    if (povMode === 'SEATED') {
-      // Seated camera view: looking directly at computer screen and desk
-      const targetCamPos = new THREE.Vector3(chairPos.x, 1.85, chairPos.z - 0.2);
-      camera.position.lerp(targetCamPos, 0.12);
-      camera.lookAt(new THREE.Vector3(-0.2, 1.95, -0.5));
+    // 1. SEATED MODE
+    if (player.isSitting) {
+      // Smoothly interpolate zoom level (bounded between 0 = default POV and 1 = max zoom)
+      seatedZoom = THREE.MathUtils.lerp(seatedZoom, targetSeatedZoom, 0.15);
+
+      const lookDir = new THREE.Vector3(
+        Math.sin(cameraYaw) * Math.cos(cameraPitch),
+        Math.sin(cameraPitch),
+        Math.cos(cameraYaw) * Math.cos(cameraPitch)
+      );
+
+      if (povMode === 'FPS') {
+        // FOV narrows smoothly from 65° down to 32° when zooming in
+        camera.fov = THREE.MathUtils.lerp(65, 32, seatedZoom);
+        camera.updateProjectionMatrix();
+
+        // Forward dolly along look direction (up to 0.45m toward target)
+        const forwardDolly = seatedZoom * 0.45;
+        const baseEyePos = new THREE.Vector3(chairPos.x, 1.78, chairPos.z - 0.15);
+        camera.position.copy(baseEyePos).addScaledVector(lookDir, forwardDolly);
+        camera.lookAt(camera.position.clone().add(lookDir));
+
+        if (player.meshGroup) {
+          player.meshGroup.visible = false;
+        }
+      } else {
+        // 3rd Person Seated: Distance moves closer from 2.4 down to 1.3
+        if (player.meshGroup) {
+          player.meshGroup.visible = true;
+        }
+
+        camera.fov = THREE.MathUtils.lerp(65, 45, seatedZoom);
+        camera.updateProjectionMatrix();
+
+        const camDist = THREE.MathUtils.lerp(2.4, 1.3, seatedZoom);
+        const targetCamPos = new THREE.Vector3(
+          chairPos.x - Math.sin(cameraYaw) * camDist,
+          THREE.MathUtils.lerp(2.05, 1.6, seatedZoom) - Math.sin(cameraPitch) * 1.2,
+          (chairPos.z + 0.4) - Math.cos(cameraYaw) * camDist
+        );
+
+        camera.position.lerp(targetCamPos, 0.18);
+        camera.lookAt(new THREE.Vector3(chairPos.x, 1.35, chairPos.z - 0.5));
+      }
       return;
     }
 
+    // Ensure FOV is default 65 when walking
+    if (camera.fov !== 65) {
+      camera.fov = 65;
+      camera.updateProjectionMatrix();
+    }
+
+    // 2. WALKING MODES
     if (povMode === 'FPS') {
-      // First-person view from character eye level
-      camera.position.set(player.pos.x, player.pos.y + 1.48, player.pos.z);
+      camera.position.set(player.pos.x, player.pos.y + 1.62, player.pos.z);
 
       const lookDir = new THREE.Vector3(
         Math.sin(cameraYaw) * Math.cos(cameraPitch),
@@ -1609,12 +1509,10 @@
 
       camera.lookAt(camera.position.clone().add(lookDir));
 
-      // In FPS mode, hide player mesh so it doesn't block the camera
       if (player.meshGroup) {
         player.meshGroup.visible = false;
       }
     } else {
-      // Third-person Roblox camera behind player
       if (player.meshGroup) {
         player.meshGroup.visible = true;
       }
@@ -1641,16 +1539,14 @@
     renderer.setSize(w, h);
   }
 
-  // --- MAIN LOOP ---
   function animate() {
     requestAnimationFrame(animate);
 
     const delta = clock.getDelta();
     const time = clock.getElapsedTime();
 
-    // Floating hologram slip bobbing
     if (hologramMesh) {
-      hologramMesh.position.y = 2.5 + Math.sin(time * 2.2) * 0.06;
+      hologramMesh.position.y = 2.15 + Math.sin(time * 2.2) * 0.05;
       hologramMesh.rotation.y = -0.4 + Math.sin(time * 1.2) * 0.04;
     }
 
@@ -1663,32 +1559,35 @@
     renderer.render(scene, camera);
   }
 
-  // --- PUBLIC API EXPOSED TO WINDOW ---
+  // --- PUBLIC API ---
   window.Payroll3D = {
     init,
     sitDown: sitDownAtChair,
     standUp: standUp,
     togglePov: togglePovMode,
+    isSitting() {
+      return player.isSitting;
+    },
     setGrade(grade) {
       currentGrade = grade;
       const cfg = GRADE_CONFIG[grade] || GRADE_CONFIG['A'];
       updateIdBadge(grade, cfg.salary);
-      updateMonitor('READY', `Memilih ${cfg.name} (Array Index: [${cfg.index}])`);
+      updateMonitor('Siap', `Golongan ${grade}`);
       SoundFX.click();
     },
     startCalculating() {
-      updateMonitor('CALCULATING', 'Memproses kalkulasi via Java WebServer...');
+      updateMonitor('Menghitung', 'Memproses kalkulasi...');
       SoundFX.click();
     },
     showResult(data) {
-      updateMonitor('SUCCESS', `Total: Rp ${Number(data.totalPenghasilan).toLocaleString('id-ID')}`);
+      updateMonitor('Selesai', `Total: Rp ${Number(data.totalPenghasilan).toLocaleString('id-ID')}`);
       updateHologramSlip(data);
       spawnMoneyStacks(data.gajiPokok, data.gajiLembur);
       triggerCelebration();
       SoundFX.chime();
     },
     showError(msg) {
-      updateMonitor('ERROR', msg);
+      updateMonitor('Error', msg);
     },
     toggleMute() {
       SoundFX.muted = !SoundFX.muted;
