@@ -1,139 +1,111 @@
-# Perhitungan Penghasilan Karyawan
+# Tugas 3: Perhitungan Penghasilan Karyawan (Operator, IF, dan Array)
 
-Aplikasi web sederhana untuk menghitung penghasilan bulanan karyawan berdasarkan **golongan** dan **jumlah jam lembur**. Proyek ini dibuat sebagai tugas Algoritma dan Pemrograman menggunakan Java sebagai web server, serta HTML, CSS, dan JavaScript sebagai antarmuka pengguna.
+Aplikasi web interaktif untuk menghitung penghasilan bulanan karyawan berdasarkan **golongan** dan **jumlah jam lembur**. Proyek ini dibuat untuk memenuhi **Tugas 3 Algoritma dan Pemrograman** menggunakan bahasa **Java** sebagai backend web server, serta antarmuka modern yang dilengkapi **visualisasi 3D workstation interaktif (Three.js)**.
 
-## Fitur
+Program mengimplementasikan konsep:
+1. **Array** untuk penyimpanan data tarif gaji dan persentase lembur.
+2. **Struktur Kontrol IF** untuk penentuan indeks array berdasarkan input.
+3. **Operator Aritmatika** (`*` dan `+`) untuk kalkulasi gaji lembur dan total penghasilan.
 
-- Memilih golongan karyawan A, B, atau C.
-- Memasukkan jumlah jam lembur.
-- Menghitung gaji pokok, persentase lembur, nominal lembur, dan total penghasilan.
-- Menampilkan hasil perhitungan melalui halaman web.
-- Menyediakan validasi input pada server Java.
-- Menyertakan pseudocode dan flowchart algoritma.
+---
 
-## Ketentuan Perhitungan
+## Ketentuan Kasus Tugas 3
 
-| Golongan | Gaji Pokok |
-|:---:|---:|
-| A | Rp5.000.000 |
-| B | Rp6.500.000 |
-| C | Rp9.500.000 |
+### 1. Array Gaji Pokok
+Gaji setiap golongan disimpan pada **Array Gaji** (`ARRAY_GAJI`):
+- Input Golongan **"A"** &rarr; Mengambil gaji pada **Array indeks 0** (Rp 5.000.000)
+- Input Golongan **"B"** &rarr; Mengambil gaji pada **Array indeks 1** (Rp 6.500.000)
+- Input Golongan **"C"** &rarr; Mengambil gaji pada **Array indeks 2** (Rp 9.500.000)
 
-Persentase uang lembur ditentukan sebagai berikut:
+### 2. Array Persen Lembur
+Persentase lembur disimpan pada **Array Lembur** (`ARRAY_LEMBUR`): `[0.30, 0.32, 0.34, 0.36, 0.38]` (30%, 32%, 34%, 36%, 38%):
+- Lembur **1 Jam** &rarr; 30% dari Gaji Pokok (**Array lembur indeks 0**)
+- Lembur **2 Jam** &rarr; 32% dari Gaji Pokok (**Array lembur indeks 1**)
+- Lembur **3 Jam** &rarr; 34% dari Gaji Pokok (**Array lembur indeks 2**)
+- Lembur **4 Jam** &rarr; 36% dari Gaji Pokok (**Array lembur indeks 3**)
+- Lembur **&ge; 5 Jam** &rarr; 38% dari Gaji Pokok (**Array lembur indeks 4**)
+- Lembur **0 Jam** &rarr; 0% (tidak ada lembur)
 
-| Jam Lembur | Persentase |
-|:---:|---:|
-| 0 jam | 0% |
-| 1 jam | 30% |
-| 2 jam | 32% |
-| 3 jam | 34% |
-| 4 jam | 36% |
-| 5 jam atau lebih | 38% |
+### 3. Rumus Perhitungan (Operator)
+- **Gaji Lembur**: `persenLembur * gajiPokok`
+- **Total Penghasilan**: `gajiPokok + gajiLembur`
 
-Rumus yang digunakan:
-
-```text
-Gaji Lembur = Persentase Lembur × Gaji Pokok
-Total Penghasilan = Gaji Pokok + Gaji Lembur
-```
+---
 
 ## Persyaratan
-
 - Java Development Kit (JDK) 11 atau lebih baru.
-- Browser web modern seperti Chrome, Firefox, atau Microsoft Edge.
-- Terminal atau command prompt.
+- Web Browser modern (Chrome, Firefox, Edge, Safari, dll.).
 
-Aplikasi menggunakan `com.sun.net.httpserver.HttpServer` yang tersedia pada JDK. Tidak diperlukan framework atau dependensi tambahan.
+---
 
 ## Cara Menjalankan
 
-1. Buka terminal dan masuk ke folder proyek:
-
+1. Buka terminal di folder proyek ini.
+2. Jalankan web server Java:
    ```bash
-   cd "/home/fahrudin/Projects/Tugas 1, 2 dan 3 - Algoritma dan Pemograman"
+   java WebServer.java
    ```
-
-   Jika proyek sudah diunduh dari GitHub, gunakan lokasi folder hasil clone.
-
-2. Kompilasi program Java:
-
-   ```bash
-   javac WebServer.java
+3. Buka browser dan akses alamat berikut:
+   ```text
+   http://localhost:8080
    ```
+4. Pilih **Golongan Karyawan**, masukkan **Jumlah Jam Lembur** (atau klik tombol opsi jam cepat), lalu klik tombol **Hitung Penghasilan**.
+5. Untuk menghentikan server, tekan `Ctrl + C` pada terminal.
 
-3. Jalankan server:
+---
 
-   ```bash
-   java WebServer
-   ```
-
-4. Buka alamat berikut pada browser:
-
-   <http://localhost:8080>
-
-5. Pilih golongan, masukkan jumlah jam lembur, lalu tekan **Hitung Penghasilan**.
-
-Untuk menghentikan server, tekan `Ctrl+C` pada terminal.
-
-> Jalankan perintah `java WebServer` dari folder yang sama dengan `index.html` dan `style.css`, karena server membaca kedua file tersebut dari direktori kerja saat ini.
-
-## Struktur Folder
+## Struktur File
 
 ```text
 .
-├── WebServer.java
-├── index.html
-├── style.css
-└── flowchart_pseudocode/
-    ├── flowchart_gaji_karyawan.drawio
-    └── pseudocode_gaji_karyawan.md
+├── WebServer.java     # HTTP Web Server & logika backend Tugas 3 (Operator, IF, Array)
+├── index.html         # Antarmuka web (form input, panel 3D, dan tabel hasil)
+├── style.css          # Desain tata letak visual modern fintech & HUD 3D
+├── js/
+│   ├── payroll3d.js   # Script visualisasi 3D workstation & animasi slip gaji
+│   ├── three.min.js   # Library Three.js (offline bundle, zero npm dependency)
+│   └── OrbitControls.js # Kontrol interaktif kamera 3D (rotasi & zoom)
+└── README.md          # Dokumentasi proyek Tugas 3
 ```
 
-### Penjelasan File
-
-- `WebServer.java` — server HTTP sederhana, endpoint perhitungan, validasi, dan logika algoritma.
-- `index.html` — tampilan form dan JavaScript untuk mengirim input serta menampilkan hasil.
-- `style.css` — gaya visual halaman web.
-- `flowchart_pseudocode/pseudocode_gaji_karyawan.md` — pseudocode dan tabel pengujian algoritma.
-- `flowchart_pseudocode/flowchart_gaji_karyawan.drawio` — flowchart yang dapat dibuka menggunakan [diagrams.net](https://app.diagrams.net/).
+---
 
 ## Endpoint API
 
-Server menyediakan endpoint berikut:
+Server menyediakan endpoint REST sederhana:
 
 ```text
-GET /hitung?golongan=A&jam=2
+GET /hitung?golongan=B&jam=2
 ```
 
-Contoh respons berhasil:
-
+Contoh respons berhasil (`200 OK`):
 ```json
 {
-  "golongan": "A",
-  "gajiPokok": 5000000,
+  "golongan": "B",
+  "gajiPokok": 6500000,
   "jamLembur": 2,
   "persenLembur": 32,
-  "gajiLembur": 1600000,
-  "totalPenghasilan": 6600000
+  "gajiLembur": 2080000,
+  "totalPenghasilan": 8580000
 }
 ```
 
-Jika input tidak valid, server mengembalikan respons HTTP `400` dengan pesan kesalahan dalam format JSON.
+Jika parameter tidak sesuai, server mengembalikan status `400 Bad Request` dengan pesan error dalam format JSON.
 
-## Contoh Pengujian
+---
 
-Input:
+## Contoh Hasil Pengujian
 
-- Golongan: `B`
-- Jam lembur: `2`
+| Kasus | Input Golongan | Input Jam Lembur | Gaji Pokok (Array Gaji) | % Lembur (Array Lembur) | Gaji Lembur | Total Penghasilan |
+|:---:|:---:|:---:|---:|:---:|---:|---:|
+| Uji 1 | A | 1 Jam | Rp 5.000.000 (Indeks 0) | 30% (Indeks 0) | Rp 1.500.000 | **Rp 6.500.000** |
+| Uji 2 | B | 2 Jam | Rp 6.500.000 (Indeks 1) | 32% (Indeks 1) | Rp 2.080.000 | **Rp 8.580.000** |
+| Uji 3 | C | 3 Jam | Rp 9.500.000 (Indeks 2) | 34% (Indeks 2) | Rp 3.230.000 | **Rp 12.730.000** |
+| Uji 4 | A | 4 Jam | Rp 5.000.000 (Indeks 0) | 36% (Indeks 3) | Rp 1.800.000 | **Rp 6.800.000** |
+| Uji 5 | B | 6 Jam | Rp 6.500.000 (Indeks 1) | 38% (Indeks 4) | Rp 2.470.000 | **Rp 8.970.000** |
+| Uji 6 | C | 0 Jam | Rp 9.500.000 (Indeks 2) | 0% (Default) | Rp 0 | **Rp 9.500.000** |
 
-Hasil:
-
-- Gaji pokok: Rp6.500.000
-- Persentase lembur: 32%
-- Gaji lembur: Rp2.080.000
-- Total penghasilan: Rp8.580.000
+---
 
 ## Lisensi
-
-Proyek ini dibuat untuk keperluan pembelajaran dan tugas akademik.
+Proyek ini dibuat untuk keperluan pembelajaran dan tugas akademik mata kuliah Algoritma dan Pemrograman.

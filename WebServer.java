@@ -15,89 +15,85 @@ public class WebServer {
 
     private static final int PORT = 8080;
 
+    public static final double[] ARRAY_GAJI = { 5000000.0, 6500000.0, 9500000.0 };
+    public static final double[] ARRAY_LEMBUR = { 0.30, 0.32, 0.34, 0.36, 0.38 };
+
     public static void main(String[] args) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
 
-        // Routing halaman web (HTML, CSS) dan API hitung
-        server.createContext("/", exchange -> layaniFile(exchange, "index.html", "text/html; charset=UTF-8"));
-        server.createContext("/style.css", exchange -> layaniFile(exchange, "style.css", "text/css; charset=UTF-8"));
+        server.createContext("/", WebServer::layaniFileStatis);
         server.createContext("/hitung", WebServer::handleHitung);
 
         server.start();
 
-        System.out.println("==================================================");
-        System.out.println(" Tugas 2: Perhitungan Penghasilan Karyawan");
-        System.out.println(" Server aktif di : http://localhost:" + PORT);
-        System.out.println(" Silakan buka link di atas pada browser Anda.");
-        System.out.println(" Tekan Ctrl+C untuk menghentikan server.");
-        System.out.println("==================================================");
+        System.out.println("Server berjalan di http://localhost:" + PORT);
     }
 
-    // Tahap 1: Menentukan Gaji Pokok berdasarkan Golongan menggunakan Statemen IF
     public static double tentukanGajiPokok(char golongan) {
         char kode = Character.toUpperCase(golongan);
 
         if (kode == 'A') {
-            return 5_000_000.0;
+            return ARRAY_GAJI[0];
         } else if (kode == 'B') {
-            return 6_500_000.0;
+            return ARRAY_GAJI[1];
         } else if (kode == 'C') {
-            return 9_500_000.0;
+            return ARRAY_GAJI[2];
         } else {
-            return -1.0; // Golongan tidak valid
+            return -1.0;
         }
     }
 
-    // Tahap 2: Menentukan Persentase Lembur berdasarkan Jam Lembur menggunakan Statemen IF
     public static double tentukanPersenLembur(int jamLembur) {
         if (jamLembur == 1) {
-            return 0.30;
+            return ARRAY_LEMBUR[0];
         } else if (jamLembur == 2) {
-            return 0.32;
+            return ARRAY_LEMBUR[1];
         } else if (jamLembur == 3) {
-            return 0.34;
+            return ARRAY_LEMBUR[2];
         } else if (jamLembur == 4) {
-            return 0.36;
+            return ARRAY_LEMBUR[3];
         } else if (jamLembur >= 5) {
-            return 0.38;
-        } else {
+            return ARRAY_LEMBUR[4];
+        } else if (jamLembur == 0) {
             return 0.00;
+        } else {
+            return -1.0;
         }
     }
 
-    // Tahap 3: Menghitung Gaji Lembur menggunakan Operator Perkalian (*)
     public static double hitungGajiLembur(double gajiPokok, double persenLembur) {
         return persenLembur * gajiPokok;
     }
 
-    // Tahap 4: Menghitung Total Penghasilan menggunakan Operator Penjumlahan (+)
     public static double hitungTotalPenghasilan(double gajiPokok, double gajiLembur) {
         return gajiPokok + gajiLembur;
     }
 
-    // Menerima parameter dari browser, memproses perhitungan, dan mengirim JSON
     private static void handleHitung(HttpExchange exchange) throws IOException {
         try {
-            // 1. Ambil data dari URL (contoh: /hitung?golongan=A&jam=2)
             String query = exchange.getRequestURI().getQuery();
             Map<String, String> param = parseQuery(query);
 
-            char golongan = param.getOrDefault("golongan", "").charAt(0);
+            String golonganParam = param.getOrDefault("golongan", "").trim();
+            if (golonganParam.isEmpty()) {
+                kirimTeks(exchange, 400, "{\"error\":\"Golongan tidak boleh kosong!\"}");
+                return;
+            }
+
+            char golongan = golonganParam.charAt(0);
             int jamLembur = Integer.parseInt(param.getOrDefault("jam", "-1"));
 
-            // 2. Validasi input
             double gajiPokok = tentukanGajiPokok(golongan);
-            if (gajiPokok < 0 || jamLembur < 0) {
+            double persenLembur = tentukanPersenLembur(jamLembur);
+
+            if (gajiPokok < 0 || persenLembur < 0) {
                 kirimTeks(exchange, 400, "{\"error\":\"Golongan (A/B/C) atau jam lembur tidak valid!\"}");
                 return;
             }
 
-            // 3. Hitung hasil sesuai logika tugas 2
-            double persenLembur = tentukanPersenLembur(jamLembur);
             double gajiLembur = hitungGajiLembur(gajiPokok, persenLembur);
             double total = hitungTotalPenghasilan(gajiPokok, gajiLembur);
 
-            // 4. Kirim hasil format JSON ke browser
             String json = String.format(Locale.US,
                 "{\"golongan\":\"%c\",\"gajiPokok\":%.0f,\"jamLembur\":%d,\"persenLembur\":%.0f,\"gajiLembur\":%.0f,\"totalPenghasilan\":%.0f}",
                 Character.toUpperCase(golongan), gajiPokok, jamLembur, persenLembur * 100, gajiLembur, total
@@ -109,7 +105,6 @@ public class WebServer {
         }
     }
 
-    // Mengurai query URL (misal: "golongan=A&jam=2") menjadi pasangan data
     private static Map<String, String> parseQuery(String query) {
         Map<String, String> map = new HashMap<>();
         if (query != null && !query.isEmpty()) {
@@ -123,17 +118,39 @@ public class WebServer {
         return map;
     }
 
-    // Mengirimkan file statis (HTML atau CSS) ke browser
-    private static void layaniFile(HttpExchange exchange, String namaFile, String type) throws IOException {
-        byte[] data = Files.readAllBytes(Path.of(namaFile));
-        exchange.getResponseHeaders().set("Content-Type", type);
+    private static void layaniFileStatis(HttpExchange exchange) throws IOException {
+        String uriPath = exchange.getRequestURI().getPath();
+        if (uriPath == null || uriPath.equals("/") || uriPath.isEmpty()) {
+            uriPath = "/index.html";
+        }
+
+        String pathClean = uriPath.startsWith("/") ? uriPath.substring(1) : uriPath;
+        Path filePath = Path.of(pathClean).normalize();
+
+        // Keamanan: cegah directory traversal ke luar direktori kerja
+        if (filePath.startsWith("..") || !Files.exists(filePath) || Files.isDirectory(filePath)) {
+            kirimTeks(exchange, 404, "{\"error\":\"File tidak ditemukan: " + uriPath + "\"}");
+            return;
+        }
+
+        String mime = "application/octet-stream";
+        String lower = pathClean.toLowerCase();
+        if (lower.endsWith(".html")) mime = "text/html; charset=UTF-8";
+        else if (lower.endsWith(".css")) mime = "text/css; charset=UTF-8";
+        else if (lower.endsWith(".js")) mime = "application/javascript; charset=UTF-8";
+        else if (lower.endsWith(".json")) mime = "application/json; charset=UTF-8";
+        else if (lower.endsWith(".svg")) mime = "image/svg+xml";
+        else if (lower.endsWith(".png")) mime = "image/png";
+        else if (lower.endsWith(".ico")) mime = "image/x-icon";
+
+        byte[] data = Files.readAllBytes(filePath);
+        exchange.getResponseHeaders().set("Content-Type", mime);
         exchange.sendResponseHeaders(200, data.length);
         try (OutputStream out = exchange.getResponseBody()) {
             out.write(data);
         }
     }
 
-    // Mengirimkan respon JSON / teks ke browser
     private static void kirimTeks(HttpExchange exchange, int status, String teks) throws IOException {
         byte[] data = teks.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().set("Content-Type", "application/json");
