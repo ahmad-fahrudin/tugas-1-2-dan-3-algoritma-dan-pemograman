@@ -3,283 +3,275 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Perhitungan Penghasilan Karyawan 3D — Tugas 3 Algoritma &amp; Pemrograman</title>
+  <title>Roblox Payroll Simulator 3D — Tugas 3 Algoritma &amp; Pemrograman</title>
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="app-container">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="brand-wrapper">
-        <div class="badge-row">
-          <span class="badge">Tugas 3 Algoritma &amp; Pemrograman</span>
-          <span class="badge badge-3d">3D WebGL Simulation</span>
+  <div class="game-viewport-stage">
+    <!-- 3D WebGL Canvas -->
+    <div id="canvas3d-container"></div>
+
+    <!-- Center FPS Crosshair -->
+    <div id="roblox-crosshair" class="roblox-crosshair"></div>
+
+    <!-- Top Roblox Navigation HUD -->
+    <header class="roblox-top-bar">
+      <div class="player-card">
+        <div class="player-avatar">R</div>
+        <div class="player-meta">
+          <div class="player-name">
+            <span>[R] Fahrudin</span>
+            <span style="font-size: 0.7rem; color: #38bdf8;">(Mahasiswa)</span>
+          </div>
+          <div class="health-track">
+            <div class="health-bar"></div>
+          </div>
         </div>
-        <h1 class="app-title">Perhitungan Penghasilan Karyawan</h1>
-        <p class="app-desc">Implementasi Operator, Percabangan IF, dan Struktur Data Array dengan Visualisasi 3D Interaktif</p>
       </div>
 
-      <div class="header-status">
-        <div class="server-pill">
-          <span class="indicator-dot"></span>
-          <span>Java WebServer :8080</span>
-        </div>
+      <div class="top-bar-actions">
+        <button type="button" class="roblox-btn" id="btn-toggle-pov" title="Ganti Sudut Pandang Kamera (Tab / V)">
+          <span id="pov-mode-text">POV: 1st Person (Mata)</span>
+        </button>
+
+        <button type="button" class="roblox-btn roblox-btn-primary" id="btn-fast-sit" title="Langsung Duduk di Meja Kerja">
+          <span>⚡ Duduk ke Meja [E]</span>
+        </button>
+
+        <button type="button" class="roblox-btn" id="btn-sound" title="Toggle Efek Suara">
+          <span id="sound-icon">🔊 SFX</span>
+        </button>
       </div>
     </header>
 
-    <!-- Main Content Workspace (Split Layout) -->
-    <main class="workspace-grid">
-      <!-- Left Column: Form Controls & Calculations -->
-      <section class="panel-controls">
-        <div class="card">
-          <div class="card-title">
-            <span>Parameter Perhitungan</span>
-            <span class="hint-tag">Array &amp; IF Logic</span>
+    <!-- Floating Interaction Prompt (Appears near the office chair) -->
+    <div id="interaction-prompt" class="interaction-prompt">
+      <kbd>E</kbd>
+      <span>Tekan <strong>E</strong> untuk Duduk di Kursi &amp; Buka Komputer</span>
+    </div>
+
+    <!-- Seated Status Indicator at Top -->
+    <div id="seated-banner" class="seated-banner">
+      <span>💻 Sedang Duduk di Meja Kerja</span>
+      <button type="button" id="btn-standup" class="standup-btn">
+        <kbd>ESC</kbd>
+        <span>Berdiri &amp; Keluar</span>
+      </button>
+    </div>
+
+    <!-- Click to Play Helper Overlay -->
+    <div id="click-hint" class="click-to-play-hint">
+      <span>🖱️ Klik pada layar untuk mengunci kursor &amp; berjalan (WASD)</span>
+    </div>
+
+    <!-- Bottom Controls Bar -->
+    <footer class="roblox-bottom-bar">
+      <div class="controls-legend">
+        <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Jalan</span>
+        <span><kbd>Shift</kbd> Lari</span>
+        <span><kbd>Spasi</kbd> Lompat</span>
+        <span><kbd>E</kbd> Duduk / Interaksi</span>
+        <span><kbd>Tab</kbd> Ganti POV</span>
+        <span><kbd>ESC</kbd> Keluar / Lepas Mouse</span>
+      </div>
+
+      <div class="controls-legend" style="margin-left: auto;">
+        <span>Java Server :8080 • Tugas 3 (Operator, IF, Array)</span>
+      </div>
+    </footer>
+
+    <!-- Interactive Terminal Drawer (Opens when Seated at Desk) -->
+    <aside id="terminal-drawer" class="terminal-drawer" aria-label="Terminal Perhitungan Gaji">
+      <div class="drawer-header">
+        <div class="drawer-title-group">
+          <h2>Terminal Payroll Karyawan</h2>
+          <span class="drawer-subtitle">IMPLEMENTASI LOGIKA ARRAY &amp; OPERATOR JAVA</span>
+        </div>
+        <button type="button" id="drawer-close" class="drawer-close-btn">
+          <span>ESC Berdiri</span>
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <form id="salary-form">
+          <!-- Golongan Selection -->
+          <div class="form-section">
+            <label class="field-label">
+              <span>1. Golongan Karyawan</span>
+              <span class="subtext">ARRAY_GAJI [0..2]</span>
+            </label>
+
+            <div class="golongan-cards" role="radiogroup" aria-label="Pilih Golongan Karyawan">
+              <label class="gol-card-label gol-a">
+                <input type="radio" name="golongan" value="A" checked>
+                <div class="gol-card-inner">
+                  <span class="gol-letter">Gol A</span>
+                  <span class="gol-salary">Rp 5.000.000</span>
+                  <span class="gol-index">Array [0]</span>
+                </div>
+              </label>
+
+              <label class="gol-card-label gol-b">
+                <input type="radio" name="golongan" value="B">
+                <div class="gol-card-inner">
+                  <span class="gol-letter">Gol B</span>
+                  <span class="gol-salary">Rp 6.500.000</span>
+                  <span class="gol-index">Array [1]</span>
+                </div>
+              </label>
+
+              <label class="gol-card-label gol-c">
+                <input type="radio" name="golongan" value="C">
+                <div class="gol-card-inner">
+                  <span class="gol-letter">Gol C</span>
+                  <span class="gol-salary">Rp 9.500.000</span>
+                  <span class="gol-index">Array [2]</span>
+                </div>
+              </label>
+            </div>
           </div>
 
-          <form id="salary-form">
-            <!-- Golongan Selection (Interactive Cards) -->
-            <div class="form-section">
-              <label class="field-label">
-                <span>1. Golongan Karyawan</span>
-                <span class="subtext">ARRAY_GAJI [0..2]</span>
-              </label>
+          <!-- Jam Lembur Selection -->
+          <div class="form-section">
+            <label class="field-label" for="jamLembur">
+              <span>2. Durasi Lembur (Jam)</span>
+              <span class="subtext">ARRAY_LEMBUR [0..4]</span>
+            </label>
 
-              <div class="golongan-cards" role="radiogroup" aria-label="Pilih Golongan Karyawan">
-                <label class="gol-card-label gol-a">
-                  <input type="radio" name="golongan" value="A" checked>
-                  <div class="gol-card-inner">
-                    <span class="gol-letter">Gol A</span>
-                    <span class="gol-salary">Rp 5.000.000</span>
-                    <span class="gol-index">Array Indeks [0]</span>
-                  </div>
-                </label>
-
-                <label class="gol-card-label gol-b">
-                  <input type="radio" name="golongan" value="B">
-                  <div class="gol-card-inner">
-                    <span class="gol-letter">Gol B</span>
-                    <span class="gol-salary">Rp 6.500.000</span>
-                    <span class="gol-index">Array Indeks [1]</span>
-                  </div>
-                </label>
-
-                <label class="gol-card-label gol-c">
-                  <input type="radio" name="golongan" value="C">
-                  <div class="gol-card-inner">
-                    <span class="gol-letter">Gol C</span>
-                    <span class="gol-salary">Rp 9.500.000</span>
-                    <span class="gol-index">Array Indeks [2]</span>
-                  </div>
-                </label>
-              </div>
+            <div class="jam-input-wrapper">
+              <input
+                id="jamLembur"
+                name="jamLembur"
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                value="2"
+                placeholder="0"
+                class="number-input"
+                required
+              >
             </div>
 
-            <!-- Jam Lembur Selection -->
-            <div class="form-section">
-              <label class="field-label" for="jamLembur">
-                <span>2. Jumlah Jam Lembur</span>
-                <span class="subtext">ARRAY_LEMBUR [0..4]</span>
-              </label>
-
-              <div class="jam-input-wrapper">
-                <input
-                  id="jamLembur"
-                  name="jamLembur"
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="1"
-                  value="2"
-                  placeholder="0"
-                  class="number-input"
-                  required
-                >
-              </div>
-
-              <!-- Quick Select Chips -->
-              <div class="lembur-chips">
-                <button type="button" class="chip-btn" data-jam="0">
-                  <span>0 Jam</span>
-                  <span class="chip-percent">0%</span>
-                </button>
-                <button type="button" class="chip-btn" data-jam="1">
-                  <span>1 Jam</span>
-                  <span class="chip-percent">30% [Idx 0]</span>
-                </button>
-                <button type="button" class="chip-btn active" data-jam="2">
-                  <span>2 Jam</span>
-                  <span class="chip-percent">32% [Idx 1]</span>
-                </button>
-                <button type="button" class="chip-btn" data-jam="3">
-                  <span>3 Jam</span>
-                  <span class="chip-percent">34% [Idx 2]</span>
-                </button>
-                <button type="button" class="chip-btn" data-jam="4">
-                  <span>4 Jam</span>
-                  <span class="chip-percent">36% [Idx 3]</span>
-                </button>
-                <button type="button" class="chip-btn" data-jam="5">
-                  <span>&ge; 5 Jam</span>
-                  <span class="chip-percent">38% [Idx 4]</span>
-                </button>
-              </div>
+            <!-- Quick Chips -->
+            <div class="lembur-chips">
+              <button type="button" class="chip-btn" data-jam="0">
+                <span>0 Jam</span>
+                <span class="chip-percent">0%</span>
+              </button>
+              <button type="button" class="chip-btn" data-jam="1">
+                <span>1 Jam</span>
+                <span class="chip-percent">30% [Idx 0]</span>
+              </button>
+              <button type="button" class="chip-btn active" data-jam="2">
+                <span>2 Jam</span>
+                <span class="chip-percent">32% [Idx 1]</span>
+              </button>
+              <button type="button" class="chip-btn" data-jam="3">
+                <span>3 Jam</span>
+                <span class="chip-percent">34% [Idx 2]</span>
+              </button>
+              <button type="button" class="chip-btn" data-jam="4">
+                <span>4 Jam</span>
+                <span class="chip-percent">36% [Idx 3]</span>
+              </button>
+              <button type="button" class="chip-btn" data-jam="5">
+                <span>&ge; 5 Jam</span>
+                <span class="chip-percent">38% [Idx 4]</span>
+              </button>
             </div>
+          </div>
 
-            <!-- Action Button -->
-            <button type="submit" id="submit-btn" class="submit-btn">
-              <span class="btn-icon">⚡</span>
-              <span>Hitung Penghasilan (Enter)</span>
-            </button>
-          </form>
+          <!-- Submit Button -->
+          <button type="submit" id="submit-btn" class="submit-btn">
+            <span>⚡ Hitung Penghasilan (Enter)</span>
+          </button>
+        </form>
 
-          <!-- Alert Box -->
-          <div id="alert-box" class="alert-box" role="alert"></div>
+        <!-- Alert Box -->
+        <div id="alert-box" class="alert-box" role="alert"></div>
 
-          <!-- Financial Breakdown Table -->
-          <section id="result-box" class="result-container show">
-            <table class="result-table">
-              <tbody>
-                <tr>
-                  <th scope="row">
-                    Golongan Karyawan
-                    <span class="sub-label">Ditentukan dari input Golongan</span>
-                  </th>
-                  <td id="res-golongan">Golongan A</td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    Gaji Pokok
-                    <span class="sub-label">Diambil dari ARRAY_GAJI</span>
-                  </th>
-                  <td id="res-pokok">Rp 5.000.000</td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    Durasi Lembur
-                    <span class="sub-label">Waktu kerja lembur aktual</span>
-                  </th>
-                  <td id="res-jam">2 Jam</td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    Persentase Lembur
-                    <span class="sub-label">Diambil dari ARRAY_LEMBUR</span>
-                  </th>
-                  <td id="res-persen">32%</td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    Nominal Uang Lembur
-                    <span class="sub-label">Rumus: Persen &times; Gaji Pokok</span>
-                  </th>
-                  <td id="res-lembur">Rp 1.600.000</td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr class="total-row">
-                  <th scope="row">Total Penghasilan Bulanan</th>
-                  <td id="res-total">Rp 6.600.000</td>
-                </tr>
-              </tfoot>
-            </table>
-          </section>
-        </div>
+        <!-- Result Breakdown Table -->
+        <table class="result-table">
+          <tbody>
+            <tr>
+              <th scope="row">
+                Golongan
+                <span class="sub-label">Ditentukan dari input</span>
+              </th>
+              <td id="res-golongan">Golongan A</td>
+            </tr>
+            <tr>
+              <th scope="row">
+                Gaji Pokok
+                <span class="sub-label">ARRAY_GAJI</span>
+              </th>
+              <td id="res-pokok">Rp 5.000.000</td>
+            </tr>
+            <tr>
+              <th scope="row">
+                Durasi Lembur
+                <span class="sub-label">Jam kerja tambahan</span>
+              </th>
+              <td id="res-jam">2 Jam</td>
+            </tr>
+            <tr>
+              <th scope="row">
+                Persentase Lembur
+                <span class="sub-label">ARRAY_LEMBUR</span>
+              </th>
+              <td id="res-persen">32%</td>
+            </tr>
+            <tr>
+              <th scope="row">
+                Nominal Gaji Lembur
+                <span class="sub-label">% Lembur &times; Gaji Pokok</span>
+              </th>
+              <td id="res-lembur">Rp 1.600.000</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <th scope="row">Total Penghasilan</th>
+              <td id="res-total">Rp 6.600.000</td>
+            </tr>
+          </tfoot>
+        </table>
 
-        <!-- Academic / Theory Explanation Card -->
+        <!-- Array Code Reference -->
         <div class="concept-box">
-          <h4>💡 Pemetaan Array Tugas 3</h4>
+          <h4>💡 Logika Array Java</h4>
           <div class="code-snippet">
-// Tarif Gaji Pokok (Array 1 Dimensi)
 double[] ARRAY_GAJI = { 5_000_000.0, 6_500_000.0, 9_500_000.0 };
-
-// Persentase Lembur (Array 1 Dimensi)
 double[] ARRAY_LEMBUR = { 0.30, 0.32, 0.34, 0.36, 0.38 };
           </div>
         </div>
-      </section>
-
-      <!-- Right Column: 3D Interactive Canvas Viewport -->
-      <section class="panel-viewport">
-        <!-- 3D Canvas Container -->
-        <div id="canvas3d-container"></div>
-
-        <!-- Top HUD Controls -->
-        <div class="viewport-hud-top">
-          <div class="hud-title-badge">
-            <span>🎮 Meja Kerja Payroll 3D</span>
-          </div>
-
-          <div class="camera-controls-group">
-            <button type="button" class="hud-btn" id="btn-focus-standard" title="Tampilan Standar">
-              <span>🖥️ Meja</span>
-            </button>
-            <button type="button" class="hud-btn" id="btn-focus-slip" title="Fokus ke Slip Gaji">
-              <span>📄 Slip Gaji</span>
-            </button>
-            <button type="button" class="hud-btn" id="btn-focus-money" title="Fokus ke Tumpukan Uang">
-              <span>💵 Uang Tunai</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Bottom HUD Controls -->
-        <div class="viewport-hud-bottom">
-          <div class="interaction-tip">
-            <span>🖱️ Klik kiri &amp; geser untuk memutar • Scroll untuk zoom</span>
-          </div>
-
-          <div class="camera-controls-group">
-            <button type="button" class="hud-btn" id="btn-autorotate" title="Putar Kamera Otomatis">
-              <span>🔄 Auto-Rotate</span>
-            </button>
-            <button type="button" class="hud-btn" id="btn-reset-cam" title="Reset Sudut Pandang">
-              <span>🎯 Reset</span>
-            </button>
-            <button type="button" class="hud-btn" id="btn-sound" title="Toggle Efek Suara">
-              <span>🔊 SFX</span>
-            </button>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="app-footer">
-      <p>Tugas 3 Pemrograman &amp; Algoritma &bull; Java Backend WebServer &amp; Three.js 3D Visualizer &bull; Zero Node.js Dependency</p>
-    </footer>
+      </div>
+    </aside>
   </div>
 
-  <!-- Scripts: Three.js with Local & CDN Fallback -->
+  <!-- Scripts: Local Three.js with CDN Fallback -->
   <script src="js/three.min.js"></script>
   <script>
     if (!window.THREE) {
       document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
     }
   </script>
-  <script src="js/OrbitControls.js"></script>
-  <script>
-    if (!window.THREE || !window.THREE.OrbitControls) {
-      document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"><\/script>');
-    }
-  </script>
   <script src="js/payroll3d.js"></script>
 
-  <!-- Client Application Logic -->
+  <!-- Application Logic -->
   <script>
     (function () {
       const form = document.getElementById('salary-form');
       const submitBtn = document.getElementById('submit-btn');
       const alertBox = document.getElementById('alert-box');
-      const resultBox = document.getElementById('result-box');
       const jamInput = document.getElementById('jamLembur');
       const chipBtns = document.querySelectorAll('.chip-btn');
       const golRadios = document.querySelectorAll('input[name="golongan"]');
 
-      // DOM Elements for Result Table
       const resGolongan = document.getElementById('res-golongan');
       const resPokok = document.getElementById('res-pokok');
       const resJam = document.getElementById('res-jam');
@@ -305,7 +297,13 @@ double[] ARRAY_LEMBUR = { 0.30, 0.32, 0.34, 0.36, 0.38 };
         });
       }
 
-      // Golongan Radio Change Listener
+      // Hide click hint once clicked
+      const clickHint = document.getElementById('click-hint');
+      window.addEventListener('click', () => {
+        if (clickHint) clickHint.style.display = 'none';
+      }, { once: true });
+
+      // Golongan Radio Change
       golRadios.forEach(radio => {
         radio.addEventListener('change', () => {
           if (window.Payroll3D) {
@@ -314,7 +312,7 @@ double[] ARRAY_LEMBUR = { 0.30, 0.32, 0.34, 0.36, 0.38 };
         });
       });
 
-      // Overtime Chip Click Listeners
+      // Overtime Chip Buttons
       chipBtns.forEach(btn => {
         btn.addEventListener('click', () => {
           jamInput.value = btn.dataset.jam;
@@ -325,7 +323,7 @@ double[] ARRAY_LEMBUR = { 0.30, 0.32, 0.34, 0.36, 0.38 };
 
       jamInput.addEventListener('input', updateActiveChip);
 
-      // Form Submit Handler
+      // Form Submit
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         alertBox.className = 'alert-box';
@@ -339,7 +337,7 @@ double[] ARRAY_LEMBUR = { 0.30, 0.32, 0.34, 0.36, 0.38 };
         }
 
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="btn-icon">⏳</span><span>Menghitung...</span>';
+        submitBtn.textContent = '⏳ Menghitung...';
 
         try {
           const res = await fetch(`/hitung?golongan=${encodeURIComponent(golongan)}&jam=${encodeURIComponent(jam)}`);
@@ -349,16 +347,13 @@ double[] ARRAY_LEMBUR = { 0.30, 0.32, 0.34, 0.36, 0.38 };
             throw new Error(data.error || 'Terjadi kesalahan perhitungan pada server.');
           }
 
-          // Update UI Breakdown
           resGolongan.textContent = `Golongan ${data.golongan}`;
           resPokok.textContent = formatRupiah(data.gajiPokok);
           resJam.textContent = `${data.jamLembur} Jam`;
           resPersen.textContent = `${data.persenLembur}%`;
           resLembur.textContent = formatRupiah(data.gajiLembur);
           resTotal.textContent = formatRupiah(data.totalPenghasilan);
-          resultBox.classList.add('show');
 
-          // Trigger 3D Interactive Animation
           if (window.Payroll3D) {
             window.Payroll3D.showResult(data);
           }
@@ -370,52 +365,33 @@ double[] ARRAY_LEMBUR = { 0.30, 0.32, 0.34, 0.36, 0.38 };
           }
         } finally {
           submitBtn.disabled = false;
-          submitBtn.innerHTML = '<span class="btn-icon">⚡</span><span>Hitung Penghasilan (Enter)</span>';
+          submitBtn.textContent = '⚡ Hitung Penghasilan (Enter)';
         }
       });
 
-      // HUD Buttons
-      document.getElementById('btn-focus-standard').addEventListener('click', () => {
-        if (window.Payroll3D) window.Payroll3D.focusView('standard');
-      });
-      document.getElementById('btn-focus-slip').addEventListener('click', () => {
-        if (window.Payroll3D) window.Payroll3D.focusView('slip');
-      });
-      document.getElementById('btn-focus-money').addEventListener('click', () => {
-        if (window.Payroll3D) window.Payroll3D.focusView('money');
-      });
-      document.getElementById('btn-reset-cam').addEventListener('click', () => {
-        if (window.Payroll3D) window.Payroll3D.resetCamera();
+      // Top Actions & Fast Sit
+      document.getElementById('btn-fast-sit').addEventListener('click', () => {
+        if (window.Payroll3D) window.Payroll3D.sitDown();
       });
 
-      const autoRotateBtn = document.getElementById('btn-autorotate');
-      autoRotateBtn.addEventListener('click', () => {
-        if (window.Payroll3D) {
-          const isRotating = window.Payroll3D.toggleAutoRotate();
-          autoRotateBtn.classList.toggle('active', isRotating);
-        }
+      document.getElementById('btn-standup').addEventListener('click', () => {
+        if (window.Payroll3D) window.Payroll3D.standUp();
+      });
+
+      document.getElementById('drawer-close').addEventListener('click', () => {
+        if (window.Payroll3D) window.Payroll3D.standUp();
+      });
+
+      document.getElementById('btn-toggle-pov').addEventListener('click', () => {
+        if (window.Payroll3D) window.Payroll3D.togglePov();
       });
 
       const soundBtn = document.getElementById('btn-sound');
+      const soundIcon = document.getElementById('sound-icon');
       soundBtn.addEventListener('click', () => {
         if (window.Payroll3D) {
           const isMuted = window.Payroll3D.toggleMute();
-          soundBtn.innerHTML = isMuted ? '<span>🔇 Mute</span>' : '<span>🔊 SFX</span>';
-          soundBtn.classList.toggle('active', !isMuted);
-        }
-      });
-
-      // Initial auto-calculation for nice first impression
-      window.addEventListener('load', () => {
-        if (window.Payroll3D) {
-          window.Payroll3D.showResult({
-            golongan: 'A',
-            gajiPokok: 5000000,
-            jamLembur: 2,
-            persenLembur: 32,
-            gajiLembur: 1600000,
-            totalPenghasilan: 6600000
-          });
+          soundIcon.textContent = isMuted ? '🔇 Mute' : '🔊 SFX';
         }
       });
     })();
