@@ -1,5 +1,10 @@
 /**
- * Player Component - 3D Character Model, Movement Physics & Camera
+ * Player Component - 3D Character Model (Mahasiswa UT), Movement Physics & Camera
+ * Style:
+ * - Kulit coklat sawo matang khas Indonesia (#a66a38)
+ * - Almamater kuning Universitas Terbuka (#facc15) dengan kemeja putih & dasi biru
+ * - Logo resmi UT di saku dada kiri
+ * - Rambut rapi mahasiswa
  */
 
 import { SoundFX } from './SoundFX.js';
@@ -27,29 +32,77 @@ export function initPlayerState(THREE) {
   player.vel = new THREE.Vector3();
 }
 
+function createUtLogoTexture(THREE) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+
+  // Background circle (Biru UT)
+  ctx.fillStyle = '#0f3a7a';
+  ctx.beginPath();
+  ctx.arc(64, 64, 58, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Yellow Ring
+  ctx.strokeStyle = '#facc15';
+  ctx.lineWidth = 8;
+  ctx.stroke();
+
+  // Cyan globe inner circle
+  ctx.fillStyle = '#0284c7';
+  ctx.beginPath();
+  ctx.arc(64, 64, 44, 0, Math.PI * 2);
+  ctx.fill();
+
+  // White bold 'UT' logo text
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 36px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('UT', 64, 64);
+
+  return new THREE.CanvasTexture(canvas);
+}
+
 export function buildRobloxPlayer(THREE, scene) {
   const pGroup = new THREE.Group();
   pGroup.position.copy(player.pos);
 
-  const skinMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35 });
-  const shirtMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.5 });
-  const pantsMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 });
-  const capMat = new THREE.MeshStandardMaterial({ color: 0x0369a1, roughness: 0.4 });
+  // 1. Materials: Kulit Coklat Sawo Matang & Almamater Kuning UT
+  const skinMat = new THREE.MeshStandardMaterial({ color: 0xa66a38, roughness: 0.45 }); // Kulit coklat
+  const almamaterMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.5 }); // Jas Kuning UT
+  const shirtWhiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 }); // Kemeja putih
+  const tieMat = new THREE.MeshStandardMaterial({ color: 0x0f3a7a, roughness: 0.4 }); // Dasi Biru UT
+  const pantsMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.6 }); // Celana bahan hitam/navy
+  const hairMat = new THREE.MeshStandardMaterial({ color: 0x1f1610, roughness: 0.8 }); // Rambut hitam rapi
 
-  // Torso
-  player.torso = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.52, 0.24), shirtMat);
+  // 2. Torso (Jas Almamater Kuning UT)
+  player.torso = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.52, 0.24), almamaterMat);
   player.torso.position.y = 0.72;
   player.torso.castShadow = true;
   pGroup.add(player.torso);
 
-  const collar = new THREE.Mesh(
-    new THREE.BoxGeometry(0.16, 0.08, 0.02),
-    new THREE.MeshStandardMaterial({ color: 0xffffff })
-  );
-  collar.position.set(0, 0.22, 0.125);
-  player.torso.add(collar);
+  // Kemeja Putih Bagian Dalam (V-Neck Opening)
+  const innerShirt = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.24, 0.02), shirtWhiteMat);
+  innerShirt.position.set(0, 0.14, 0.122);
+  player.torso.add(innerShirt);
 
-  // Head Group
+  // Dasi Biru UT
+  const tie = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.22, 0.025), tieMat);
+  tie.position.set(0, 0.08, 0.125);
+  player.torso.add(tie);
+
+  // Logo Resmi Universitas Terbuka di Dada Kiri
+  const utLogoTex = createUtLogoTexture(THREE);
+  const utBadge = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.10, 0.10),
+    new THREE.MeshBasicMaterial({ map: utLogoTex, transparent: true, side: THREE.DoubleSide })
+  );
+  utBadge.position.set(-0.11, 0.10, 0.126);
+  player.torso.add(utBadge);
+
+  // 3. Head Group (Wajah Coklat & Rambut Mahasiswa Rapi)
   const headGroup = new THREE.Group();
   headGroup.position.set(0, 1.16, 0);
 
@@ -57,6 +110,7 @@ export function buildRobloxPlayer(THREE, scene) {
   player.head.castShadow = true;
   headGroup.add(player.head);
 
+  // Eyes & Friendly Smile
   const eyeGeo = new THREE.BoxGeometry(0.045, 0.045, 0.02);
   const blackMat = new THREE.MeshBasicMaterial({ color: 0x0a0a0a });
 
@@ -72,19 +126,28 @@ export function buildRobloxPlayer(THREE, scene) {
   smile.position.set(0, -0.06, 0.155);
   player.head.add(smile);
 
-  const capCrown = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.09, 0.34), capMat);
-  capCrown.position.set(0, 0.16, 0);
-  player.head.add(capCrown);
+  // Rambut Mahasiswa Rapi (Gaya Belah Samping)
+  const hairTop = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.08, 0.32), hairMat);
+  hairTop.position.set(0, 0.16, 0);
+  player.head.add(hairTop);
 
-  const capVisor = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.03, 0.18), capMat);
-  capVisor.position.set(0, 0.14, 0.22);
-  player.head.add(capVisor);
+  const hairSideL = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.14, 0.30), hairMat);
+  hairSideL.position.set(-0.16, 0.08, 0);
+  player.head.add(hairSideL);
+
+  const hairSideR = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.14, 0.30), hairMat);
+  hairSideR.position.set(0.16, 0.08, 0);
+  player.head.add(hairSideR);
+
+  const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.18, 0.03), hairMat);
+  hairBack.position.set(0, 0.06, -0.15);
+  player.head.add(hairBack);
 
   pGroup.add(headGroup);
 
-  // Arms
+  // 4. Arms (Lengan Jas Almamater Kuning & Tangan Kulit Coklat)
   const armGeo = new THREE.BoxGeometry(0.14, 0.44, 0.14);
-  player.leftArm = new THREE.Mesh(armGeo, shirtMat);
+  player.leftArm = new THREE.Mesh(armGeo, almamaterMat);
   player.leftArm.position.set(-0.29, 0.68, 0);
   player.leftArm.castShadow = true;
   pGroup.add(player.leftArm);
@@ -93,7 +156,7 @@ export function buildRobloxPlayer(THREE, scene) {
   handL.position.set(0, -0.22, 0);
   player.leftArm.add(handL);
 
-  player.rightArm = new THREE.Mesh(armGeo, shirtMat);
+  player.rightArm = new THREE.Mesh(armGeo, almamaterMat);
   player.rightArm.position.set(0.29, 0.68, 0);
   player.rightArm.castShadow = true;
   pGroup.add(player.rightArm);
@@ -102,7 +165,7 @@ export function buildRobloxPlayer(THREE, scene) {
   handR.position.set(0, -0.22, 0);
   player.rightArm.add(handR);
 
-  // Legs
+  // 5. Legs (Celana Bahan Hitam Mahasiswa)
   const legGeo = new THREE.BoxGeometry(0.16, 0.46, 0.16);
   player.leftLeg = new THREE.Mesh(legGeo, pantsMat);
   player.leftLeg.position.set(-0.11, 0.23, 0);

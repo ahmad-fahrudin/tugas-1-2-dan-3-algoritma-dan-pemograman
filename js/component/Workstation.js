@@ -67,20 +67,41 @@ export function buildWorkstationDesk(THREE, scene) {
   crossbar.position.set(0, 0.25, -0.9);
   deskGroup.add(crossbar);
 
-  // 4. Glazed Porcelain Coffee Mug with Coffee
+  // 4. Glazed Porcelain Coffee Mug with Coaster & Coffee (Beside player's left side)
+  const mugX = -0.75;
+  const mugZ = 0.45;
+
+  const coaster = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.11, 0.11, 0.012, 24),
+    new THREE.MeshStandardMaterial({ color: 0x854d0e, roughness: 0.8 })
+  );
+  coaster.position.set(mugX, 1.215, mugZ);
+  coaster.receiveShadow = true;
+  deskGroup.add(coaster);
+
   const mugMesh = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.09, 0.08, 0.2, 20),
+    new THREE.CylinderGeometry(0.085, 0.075, 0.18, 20),
     new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.15 })
   );
-  mugMesh.position.set(-1.6, 1.31, -0.5);
+  mugMesh.position.set(mugX, 1.305, mugZ);
   mugMesh.castShadow = true;
+  mugMesh.receiveShadow = true;
   deskGroup.add(mugMesh);
 
+  // Ceramic Mug Handle
+  const handleMesh = new THREE.Mesh(
+    new THREE.TorusGeometry(0.045, 0.012, 12, 16, Math.PI),
+    new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.15 })
+  );
+  handleMesh.position.set(mugX - 0.085, 1.305, mugZ);
+  handleMesh.rotation.y = Math.PI / 2;
+  deskGroup.add(handleMesh);
+
   const coffeeSurface = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.08, 0.08, 0.01, 16),
+    new THREE.CylinderGeometry(0.078, 0.078, 0.01, 16),
     new THREE.MeshStandardMaterial({ color: 0x3d2314, roughness: 0.1 })
   );
-  coffeeSurface.position.set(-1.6, 1.39, -0.5);
+  coffeeSurface.position.set(mugX, 1.38, mugZ);
   deskGroup.add(coffeeSurface);
 
   // 5. Smartphone on Angled Wireless Stand

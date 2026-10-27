@@ -177,46 +177,32 @@ export function buildOfficeRoom(THREE, scene) {
   bottle.position.set(5.5, 1.68, -6.3);
   roomGroup.add(bottle);
 
-  // 10. Floor-to-Ceiling Panorama Window Wall
-  const winFrame = new THREE.Mesh(
-    new THREE.BoxGeometry(0.18, 3.8, 10.4),
-    new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.3, metalness: 0.6 })
+  // 10. Right Wall (x = 7) - Solid Architectural Wall (Identical to Left & Back Wall)
+  const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(14, 4.5), wallMat);
+  rightWall.rotation.y = -Math.PI / 2;
+  rightWall.position.set(7, 2.25, 0);
+  rightWall.receiveShadow = true;
+  roomGroup.add(rightWall);
+
+  const bbRight = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.15, 14), baseboardMat);
+  bbRight.position.set(6.98, 0.075, 0);
+  roomGroup.add(bbRight);
+
+  // Executive Whiteboard / Information Board on Right Wall
+  const boardFrame = new THREE.Mesh(
+    new THREE.BoxGeometry(0.04, 2.0, 4.2),
+    new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.3, metalness: 0.7 })
   );
-  winFrame.position.set(6.92, 2.2, 0);
-  roomGroup.add(winFrame);
+  boardFrame.position.set(6.96, 2.3, 0);
+  roomGroup.add(boardFrame);
 
-  for (let mz = -3.5; mz <= 3.5; mz += 3.5) {
-    const mullion = new THREE.Mesh(
-      new THREE.BoxGeometry(0.2, 3.75, 0.08),
-      new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.3, metalness: 0.6 })
-    );
-    mullion.position.set(6.9, 2.2, mz);
-    roomGroup.add(mullion);
-  }
-
-  const glass = new THREE.Mesh(
-    new THREE.PlaneGeometry(10.0, 3.6),
-    new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.15, roughness: 0.05 })
+  const boardSurface = new THREE.Mesh(
+    new THREE.PlaneGeometry(4.0, 1.85),
+    new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.15, metalness: 0.05 })
   );
-  glass.rotation.y = -Math.PI / 2;
-  glass.position.set(6.85, 2.2, 0);
-  roomGroup.add(glass);
-
-  // City Skyline Backdrop
-  const cityGroup = new THREE.Group();
-  cityGroup.position.set(16, 0, 0);
-  const bldColors = [0x090d16, 0x111827, 0x0f172a, 0x1e293b];
-  for (let i = -14; i <= 14; i += 2.2) {
-    const height = 7 + Math.random() * 14;
-    const width = 1.8 + Math.random() * 1.4;
-    const bld = new THREE.Mesh(
-      new THREE.BoxGeometry(width, height, width),
-      new THREE.MeshStandardMaterial({ color: bldColors[Math.floor(Math.random() * bldColors.length)], roughness: 0.6 })
-    );
-    bld.position.set(0, height / 2, i);
-    cityGroup.add(bld);
-  }
-  roomGroup.add(cityGroup);
+  boardSurface.rotation.y = -Math.PI / 2;
+  boardSurface.position.set(6.93, 2.3, 0);
+  roomGroup.add(boardSurface);
 
   scene.add(roomGroup);
 }

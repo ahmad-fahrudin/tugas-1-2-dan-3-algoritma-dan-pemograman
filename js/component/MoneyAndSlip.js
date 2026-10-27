@@ -280,9 +280,9 @@ export function buildSteamParticles(THREE, scene) {
   const positions = new Float32Array(count * 3);
 
   for (let i = 0; i < count; i++) {
-    positions[i * 3] = -1.6 + (Math.random() - 0.5) * 0.08;
-    positions[i * 3 + 1] = 1.41 + Math.random() * 0.4;
-    positions[i * 3 + 2] = -0.5 + (Math.random() - 0.5) * 0.08;
+    positions[i * 3] = -0.75 + (Math.random() - 0.5) * 0.08;
+    positions[i * 3 + 1] = 1.40 + Math.random() * 0.4;
+    positions[i * 3 + 2] = 0.45 + (Math.random() - 0.5) * 0.08;
   }
 
   geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -298,9 +298,9 @@ export function updateSteam(delta) {
     pos[i + 1] += delta * 0.22;
     pos[i] += Math.sin(pos[i + 1] * 10) * 0.001;
     if (pos[i + 1] > 1.9) {
-      pos[i + 1] = 1.41;
-      pos[i] = -1.6 + (Math.random() - 0.5) * 0.08;
-      pos[i + 2] = -0.5 + (Math.random() - 0.5) * 0.08;
+      pos[i + 1] = 1.40;
+      pos[i] = -0.75 + (Math.random() - 0.5) * 0.08;
+      pos[i + 2] = 0.45 + (Math.random() - 0.5) * 0.08;
     }
   }
   steamParticles.geometry.attributes.position.needsUpdate = true;

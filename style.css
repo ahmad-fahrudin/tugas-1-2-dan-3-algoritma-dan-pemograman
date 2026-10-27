@@ -626,93 +626,143 @@ kbd {
   }
 }
 
-/* Welcome Academic Modal */
+/* Welcome Academic Modal (Premium Presentation for Bapak Edmond) */
 .welcome-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(4, 7, 15, 0.88);
-  backdrop-filter: blur(12px);
+  background: rgba(3, 7, 18, 0.92);
+  backdrop-filter: blur(16px);
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.25s ease-out;
 }
 
 .welcome-card {
   width: 100%;
-  max-width: 580px;
-  background: #0f172a;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  max-width: 640px;
+  background: #0b1329;
+  border: 1px solid rgba(56, 189, 248, 0.25);
   border-radius: var(--radius-lg);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(2, 132, 199, 0.15);
   overflow: hidden;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .welcome-univ-header {
-  padding: 12px 20px;
-  background: #1e293b;
+  padding: 10px 18px;
+  background: #080d1a;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #38bdf8;
-  text-align: center;
+}
+
+.univ-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.univ-badge {
+  background: #facc15;
+  color: #0f3a7a;
+  font-weight: 800;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.univ-title {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .welcome-body {
-  padding: 24px;
+  padding: 20px 22px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .lecturer-welcome-banner {
-  background: rgba(2, 132, 199, 0.12);
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%);
   border: 1px solid rgba(56, 189, 248, 0.35);
   border-radius: var(--radius);
   padding: 14px 18px;
   text-align: left;
 }
 
+.lecturer-badge-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
 .lecturer-tag {
-  display: inline-block;
+  background: #0284c7;
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.status-live-tag {
+  color: #34d399;
   font-size: 0.72rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #38bdf8;
-  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-live-tag::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
 }
 
 .lecturer-heading {
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: #ffffff;
   letter-spacing: -0.01em;
   margin-bottom: 4px;
+  text-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
 }
 
 .lecturer-subtext {
   font-size: 0.82rem;
-  color: var(--text-muted);
-  line-height: 1.4;
+  color: #cbd5e1;
+  line-height: 1.45;
 }
 
 .student-info-grid {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  background: #0b1120;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 6px;
+  background: #080d1a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius);
-  padding: 14px 18px;
+  padding: 12px 16px;
 }
 
 .info-row {
   display: grid;
-  grid-template-columns: 140px 16px 1fr;
-  font-size: 0.84rem;
+  grid-template-columns: 135px 16px 1fr;
+  font-size: 0.82rem;
   align-items: baseline;
 }
 
@@ -728,45 +778,99 @@ kbd {
   color: var(--text-primary);
 }
 
-.challenge-box {
-  background: rgba(2, 132, 199, 0.08);
-  border: 1px solid rgba(56, 189, 248, 0.2);
-  border-radius: var(--radius);
-  padding: 12px 16px;
-}
-
-.challenge-title {
-  font-size: 0.82rem;
-  font-weight: 600;
+.student-name {
   color: #38bdf8;
-  margin-bottom: 4px;
+  font-weight: 700;
 }
 
-.challenge-desc {
+.student-nim {
+  font-family: var(--font-mono);
+  color: #facc15;
+  font-weight: 600;
+}
+
+/* Lecturer Interaction Guide Box */
+.lecturer-guide-box {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+
+.guide-header {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 8px;
+}
+
+.guide-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.guide-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #080d1a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.guide-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.guide-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.guide-text strong {
   font-size: 0.78rem;
+  color: #ffffff;
+}
+
+.guide-text span {
+  font-size: 0.7rem;
   color: var(--text-muted);
-  line-height: 1.5;
+  line-height: 1.35;
 }
 
 .btn-welcome-ok {
   width: 100%;
-  padding: 12px 20px;
-  background: var(--accent-blue);
+  padding: 13px 20px;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
   color: #ffffff;
   border: none;
   border-radius: var(--radius);
   font-size: 0.92rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: all 0.15s ease;
   text-align: center;
+  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
+  margin-top: 2px;
 }
 
 .btn-welcome-ok:hover {
-  background: var(--accent-blue-hover);
+  background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.5);
 }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 640px) {
+  .guide-grid {
+    grid-template-columns: 1fr;
+  }
 }

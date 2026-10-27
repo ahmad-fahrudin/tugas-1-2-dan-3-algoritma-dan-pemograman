@@ -15,24 +15,36 @@
     <div id="welcome-modal" class="welcome-modal-backdrop">
       <div class="welcome-card">
         <div class="welcome-univ-header">
-          <span>Program Studi Sistem Informasi, Fakultas Sains dan Teknologi, Universitas Terbuka</span>
+          <div class="univ-brand-row">
+            <span class="univ-badge">UNIVERSITAS TERBUKA</span>
+            <span class="univ-title">Fakultas Sains dan Teknologi • Program Studi Sistem Informasi</span>
+          </div>
         </div>
 
         <div class="welcome-body">
+          <!-- Greeting Section for Bapak Edmond -->
           <div class="lecturer-welcome-banner">
+            <div class="lecturer-badge-row">
+              <span class="lecturer-tag">DOSEN PENGUJI / PENGAMPU</span>
+              <span class="status-live-tag">Tugas 3 Siap Diuji</span>
+            </div>
             <h2 class="lecturer-heading">Selamat Datang, Bapak Edmond!</h2>
+            <p class="lecturer-subtext">
+              Terima kasih telah berkenan menguji simulasi Tugas 3 ini. Program backend Java (Operator, IF, dan Array) telah terintegrasi penuh ke dalam ruang kantor 3D interaktif.
+            </p>
           </div>
 
+          <!-- Student Profile Card -->
           <div class="student-info-grid">
             <div class="info-row">
               <span class="info-label">Nama Mahasiswa</span>
               <span class="info-colon">:</span>
-              <span class="info-value" style="font-weight: 600;">Ahmad Fahrudin</span>
+              <span class="info-value student-name">Ahmad Fahrudin</span>
             </div>
             <div class="info-row">
               <span class="info-label">NIM</span>
               <span class="info-colon">:</span>
-              <span class="info-value" style="font-family: var(--font-mono);">059610202</span>
+              <span class="info-value student-nim">059610202</span>
             </div>
             <div class="info-row">
               <span class="info-label">Program Studi</span>
@@ -51,15 +63,46 @@
             </div>
           </div>
 
-          <div class="challenge-box">
-            <div class="challenge-title">Simulasi Tugas 3: Operator, IF, dan Array</div>
-            <p class="challenge-desc">
-              Simulasi ini mengimplementasikan kasus Tugas 3 dengan backend Java (Array Gaji Rp 5jt, 6.5jt, 9.5jt &amp; Array Lembur 30%..38%) dalam workstation 3D interaktif.
-            </p>
+          <!-- Guide for Lecturer (Explicit Mouse Guidance) -->
+          <div class="lecturer-guide-box">
+            <div class="guide-header">
+              <span>🎮 Panduan Interaksi untuk Bapak Edmond:</span>
+            </div>
+            <div class="guide-grid">
+              <div class="guide-item">
+                <span class="guide-icon">🖱️</span>
+                <div class="guide-text">
+                  <strong>Gunakan Mouse</strong>
+                  <span>Geser kursor untuk melihat sekeliling ruangan 360°, dan putar roda scroll untuk zoom in/out.</span>
+                </div>
+              </div>
+              <div class="guide-item">
+                <span class="guide-icon">⌨️</span>
+                <div class="guide-text">
+                  <strong>Tombol W A S D</strong>
+                  <span>Tekan W untuk melangkah maju menghampiri kursi dan meja kerja.</span>
+                </div>
+              </div>
+              <div class="guide-item">
+                <span class="guide-icon">⚡</span>
+                <div class="guide-text">
+                  <strong>Tekan E untuk Duduk</strong>
+                  <span>Dekati kursi kerja dan tekan E untuk duduk dan membuka terminal kalkulasi gaji.</span>
+                </div>
+              </div>
+              <div class="guide-item">
+                <span class="guide-icon">🤝</span>
+                <div class="guide-text">
+                  <strong>Serahkan Gaji</strong>
+                  <span>Setelah menghitung, klik tombol untuk memanggil karyawan mengambil uangnya!</span>
+                </div>
+              </div>
+            </div>
           </div>
 
+          <!-- Start Button -->
           <button type="button" id="btn-start-game" class="btn-welcome-ok">
-            <span>Lanjut menghitung gaji karyawanmu (Oke)</span>
+            <span>Lanjut &rarr;</span>
           </button>
         </div>
       </div>
@@ -74,8 +117,8 @@
     <!-- Top Bar HUD -->
     <header class="roblox-top-bar">
       <div class="player-card">
-        <div class="player-avatar">R</div>
-        <span class="player-name">Fahrudin</span>
+        <div class="player-avatar" style="background: #facc15; color: #0f3a7a; font-weight: 800;">UT</div>
+        <span class="player-name">Ahmad Fahrudin</span>
       </div>
 
       <div class="top-bar-actions">
