@@ -66,14 +66,21 @@ Persentase lembur disimpan pada **Array Lembur** (`ARRAY_LEMBUR`): `[0.30, 0.32,
 
 ```text
 .
-├── WebServer.java     # HTTP Web Server & logika backend Tugas 3 (Operator, IF, Array)
-├── index.html         # Antarmuka web (form input, panel 3D, dan tabel hasil)
-├── style.css          # Desain tata letak visual modern fintech & HUD 3D
+├── WebServer.java       # HTTP Web Server & logika backend Tugas 3 (Operator, IF, Array)
+├── index.html           # Antarmuka web (form input, panel 3D, dan tabel hasil)
+├── style.css            # Desain tata letak visual modern & HUD 3D
 ├── js/
-│   ├── payroll3d.js   # Script visualisasi 3D workstation & animasi slip gaji
-│   ├── three.min.js   # Library Three.js (offline bundle, zero npm dependency)
-│   └── OrbitControls.js # Kontrol interaktif kamera 3D (rotasi & zoom)
-└── README.md          # Dokumentasi proyek Tugas 3
+│   ├── payroll3d.js     # Entry point & orchestrator utama simulasi 3D
+│   ├── three.min.js     # Library Three.js (offline bundle, zero npm dependency)
+│   ├── OrbitControls.js # Kontrol interaktif kamera 3D
+│   └── component/       # Clean Architecture Components:
+│       ├── OfficeRoom.js   # Arsitektur ruangan 3D (lantai, dinding slat, jendela)
+│       ├── Workstation.js  # Meja kerja, kursi ergonomis, monitor & terminal
+│       ├── Player.js       # Karakter player 3D, kontrol WASD & fisika gerak
+│       ├── NpcEmployee.js  # Karakter NPC karyawan & interaksi serahkan gaji
+│       ├── MoneyAndSlip.js # Gepokan uang rupiah, slip hologram & partikel
+│       └── SoundFX.js      # Synthesizer audio prosedural Web Audio API
+└── README.md            # Dokumentasi proyek Tugas 3
 ```
 
 ---
