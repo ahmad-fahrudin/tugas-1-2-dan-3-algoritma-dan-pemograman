@@ -11,6 +11,60 @@
 </head>
 <body>
   <div class="game-viewport-stage">
+    <!-- Welcome Academic Modal -->
+    <div id="welcome-modal" class="welcome-modal-backdrop">
+      <div class="welcome-card">
+        <div class="welcome-univ-header">
+          <span>Program Studi Sistem Informasi, Fakultas Sains dan Teknologi, Universitas Terbuka</span>
+        </div>
+
+        <div class="welcome-body">
+          <div class="lecturer-welcome-banner">
+            <h2 class="lecturer-heading">Selamat Datang, Bapak Edmond!</h2>
+          </div>
+
+          <div class="student-info-grid">
+            <div class="info-row">
+              <span class="info-label">Nama Mahasiswa</span>
+              <span class="info-colon">:</span>
+              <span class="info-value" style="font-weight: 600;">Ahmad Fahrudin</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">NIM</span>
+              <span class="info-colon">:</span>
+              <span class="info-value" style="font-family: var(--font-mono);">059610202</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Program Studi</span>
+              <span class="info-colon">:</span>
+              <span class="info-value">Sistem Informasi</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Mata Kuliah</span>
+              <span class="info-colon">:</span>
+              <span class="info-value">Algoritma dan Pemrograman (Tugas 3)</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">UPBJJ-UT</span>
+              <span class="info-colon">:</span>
+              <span class="info-value">Universitas Terbuka Semarang</span>
+            </div>
+          </div>
+
+          <div class="challenge-box">
+            <div class="challenge-title">Simulasi Tugas 3: Operator, IF, dan Array</div>
+            <p class="challenge-desc">
+              Simulasi ini mengimplementasikan kasus Tugas 3 dengan backend Java (Array Gaji Rp 5jt, 6.5jt, 9.5jt &amp; Array Lembur 30%..38%) dalam workstation 3D interaktif.
+            </p>
+          </div>
+
+          <button type="button" id="btn-start-game" class="btn-welcome-ok">
+            <span>Lanjut menghitung gaji karyawanmu (Oke)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- 3D Canvas -->
     <div id="canvas3d-container"></div>
 
@@ -323,6 +377,14 @@
           window.Payroll3D.handoverSalary(lastCalculationData, () => {
             btnHandover.textContent = 'Gaji Telah Diterima ✓';
           });
+        });
+      }
+
+      const welcomeModal = document.getElementById('welcome-modal');
+      const btnStartGame = document.getElementById('btn-start-game');
+      if (btnStartGame && welcomeModal) {
+        btnStartGame.addEventListener('click', () => {
+          welcomeModal.style.display = 'none';
         });
       }
 

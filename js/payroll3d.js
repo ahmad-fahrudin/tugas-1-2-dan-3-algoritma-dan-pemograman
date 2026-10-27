@@ -1,5 +1,5 @@
 /**
- * Payroll3D & Roblox Office Simulator
+ * Payroll3D - Interactive 3D Workstation Simulation
  * Tugas 3: Algoritma dan Pemrograman (Operator, IF, dan Array)
  * Standard Minimalist UI & Balanced Viewport
  */

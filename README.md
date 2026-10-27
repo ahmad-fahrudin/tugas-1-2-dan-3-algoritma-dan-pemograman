@@ -49,13 +49,13 @@ Persentase lembur disimpan pada **Array Lembur** (`ARRAY_LEMBUR`): `[0.30, 0.32,
    ```text
    http://localhost:8080
    ```
-4. **Kontrol Simulasi Roblox 3D:**
+4. **Kontrol Simulasi 3D Interaktif:**
    - **Klik Layar:** Mengunci kursor mouse untuk mode bermain.
    - **`W`, `A`, `S`, `D`:** Berjalan menjelajahi ruangan kantor.
    - **Gerakan Mouse:** Mengarahkan pandangan kamera (FPS / 3rd Person).
    - **`Shift`:** Berlari cepat (*Sprint*).
    - **`Spasi`:** Melompat (*Jump*).
-   - **`Tab` / `V`:** Berganti sudut pandang kamera (*First-Person* / *Third-Person* karakter Roblox).
+   - **`Tab` / `V`:** Berganti sudut pandang kamera (*First-Person* / *Third-Person*).
    - **`E`:** Mendekati kursi kerja dan tekan **E** untuk duduk serta membuka terminal kalkulasi gaji.
    - **`ESC`:** Berdiri dari kursi dan melepaskan kursor mouse untuk kembali menjelajah.
 5. Untuk menghentikan server, tekan `Ctrl + C` pada terminal.
