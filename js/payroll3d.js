@@ -232,8 +232,8 @@
     clock = new THREE.Clock();
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x090d16);
-    scene.fog = new THREE.FogExp2(0x090d16, 0.035);
+    scene.background = new THREE.Color(0x0f172a);
+    scene.fog = new THREE.FogExp2(0x0f172a, 0.025);
 
     const aspect = container.clientWidth / container.clientHeight;
     camera = new THREE.PerspectiveCamera(65, aspect, 0.1, 100);
@@ -245,7 +245,7 @@
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMappingExposure = 1.18;
     container.appendChild(renderer.domElement);
 
     setupLighting();
@@ -276,26 +276,39 @@
     animate();
   }
 
-  // --- LIGHTING ---
+  // --- LIGHTING (BALANCED NATURAL OFFICE ILLUMINATION) ---
   function setupLighting() {
-    const ambient = new THREE.AmbientLight(0x1e293b, 1.4);
+    // Natural soft ambient light
+    const ambient = new THREE.AmbientLight(0xecf0f5, 1.0);
     scene.add(ambient);
 
-    const ceilingLight = new THREE.PointLight(0xf8fafc, 2.0, 16);
+    // Main key light with natural soft shadows
+    const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.25);
+    sunLight.position.set(4, 8, 5);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 1024;
+    sunLight.shadow.mapSize.height = 1024;
+    sunLight.shadow.bias = -0.0005;
+    scene.add(sunLight);
+
+    // Soft ceiling panel light
+    const ceilingLight = new THREE.PointLight(0xf8fafc, 1.4, 18);
     ceilingLight.position.set(0, 4.2, 0);
     ceilingLight.castShadow = true;
     scene.add(ceilingLight);
 
-    const deskSpot = new THREE.SpotLight(0xfef08a, 2.5, 8, Math.PI / 3.5, 0.4, 1);
+    // Warm desk task lamp
+    const deskSpot = new THREE.SpotLight(0xfef3c7, 1.8, 10, Math.PI / 3.4, 0.4, 1);
     deskSpot.position.set(-1.8, 2.6, 0.8);
     deskSpot.target.position.set(0, 1.15, 0.3);
     deskSpot.castShadow = true;
     scene.add(deskSpot);
     scene.add(deskSpot.target);
 
-    const cyanLight = new THREE.PointLight(0x38bdf8, 1.5, 14);
-    cyanLight.position.set(5.5, 3.0, 1.0);
-    scene.add(cyanLight);
+    // Subtle window bounce fill
+    const windowLight = new THREE.DirectionalLight(0xe0f2fe, 0.6);
+    windowLight.position.set(8, 3.5, 0);
+    scene.add(windowLight);
   }
 
   // --- OFFICE ROOM ---
@@ -719,8 +732,8 @@
 
   function buildMoneyGroup() {
     moneyGroup = new THREE.Group();
-    // Placed on open right counter in front of employee
-    moneyGroup.position.set(1.1, 1.215, -0.75);
+    // Di depan player di atas meja (bukan di belakang layar)
+    moneyGroup.position.set(0.50, 1.215, 0.38);
     scene.add(moneyGroup);
   }
 
@@ -1385,7 +1398,7 @@
       roughness: 0.2
     });
 
-    const spawnOrigin = new THREE.Vector3(0.6, 1.5, 0.4);
+    const spawnOrigin = new THREE.Vector3(0.50, 1.45, 0.38);
 
     for (let i = 0; i < 25; i++) {
       const coin = new THREE.Mesh(coinGeo, coinMat);

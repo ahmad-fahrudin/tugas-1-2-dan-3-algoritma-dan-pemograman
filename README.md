@@ -102,18 +102,5 @@ Jika parameter tidak sesuai, server mengembalikan status `400 Bad Request` denga
 
 ---
 
-## Contoh Hasil Pengujian
-
-| Kasus | Input Golongan | Input Jam Lembur | Gaji Pokok (Array Gaji) | % Lembur (Array Lembur) | Gaji Lembur | Total Penghasilan |
-|:---:|:---:|:---:|---:|:---:|---:|---:|
-| Uji 1 | A | 1 Jam | Rp 5.000.000 (Indeks 0) | 30% (Indeks 0) | Rp 1.500.000 | **Rp 6.500.000** |
-| Uji 2 | B | 2 Jam | Rp 6.500.000 (Indeks 1) | 32% (Indeks 1) | Rp 2.080.000 | **Rp 8.580.000** |
-| Uji 3 | C | 3 Jam | Rp 9.500.000 (Indeks 2) | 34% (Indeks 2) | Rp 3.230.000 | **Rp 12.730.000** |
-| Uji 4 | A | 4 Jam | Rp 5.000.000 (Indeks 0) | 36% (Indeks 3) | Rp 1.800.000 | **Rp 6.800.000** |
-| Uji 5 | B | 6 Jam | Rp 6.500.000 (Indeks 1) | 38% (Indeks 4) | Rp 2.470.000 | **Rp 8.970.000** |
-| Uji 6 | C | 0 Jam | Rp 9.500.000 (Indeks 2) | 0% (Default) | Rp 0 | **Rp 9.500.000** |
-
----
-
 ## Lisensi
 Proyek ini dibuat untuk keperluan pembelajaran dan tugas akademik mata kuliah Algoritma dan Pemrograman.
