@@ -181,14 +181,8 @@
           </tfoot>
         </table>
 
-        <!-- Array Code Reference -->
-        <div class="concept-box">
-          <h4>Logika Array Java</h4>
-          <div class="code-snippet">
-double[] ARRAY_GAJI = { 5_000_000.0, 6_500_000.0, 9_500_000.0 };
-double[] ARRAY_LEMBUR = { 0.30, 0.32, 0.34, 0.36, 0.38 };
-          </div>
-        </div>
+        <!-- Tombol Serahkan Gaji -->
+        <button type="button" id="btn-handover" class="btn-handover" style="display: none;">Serahkan Gaji</button>
       </div>
     </aside>
   </div>
@@ -205,10 +199,20 @@ double[] ARRAY_LEMBUR = { 0.30, 0.32, 0.34, 0.36, 0.38 };
     (function () {
       const form = document.getElementById('salary-form');
       const submitBtn = document.getElementById('submit-btn');
+      const btnHandover = document.getElementById('btn-handover');
       const alertBox = document.getElementById('alert-box');
       const jamInput = document.getElementById('jamLembur');
       const chipBtns = document.querySelectorAll('.chip-btn');
       const golRadios = document.querySelectorAll('input[name="golongan"]');
+
+      let lastCalculationData = {
+        golongan: 'A',
+        gajiPokok: 5000000,
+        jamLembur: 2,
+        persenLembur: 32,
+        gajiLembur: 1600000,
+        totalPenghasilan: 6600000
+      };
 
       const resGolongan = document.getElementById('res-golongan');
       const resPokok = document.getElementById('res-pokok');
@@ -288,8 +292,15 @@ double[] ARRAY_LEMBUR = { 0.30, 0.32, 0.34, 0.36, 0.38 };
           resLembur.textContent = formatRupiah(data.gajiLembur);
           resTotal.textContent = formatRupiah(data.totalPenghasilan);
 
+          lastCalculationData = data;
           if (window.Payroll3D) {
             window.Payroll3D.showResult(data);
+          }
+
+          if (btnHandover) {
+            btnHandover.style.display = 'flex';
+            btnHandover.disabled = false;
+            btnHandover.textContent = 'Serahkan Gaji';
           }
         } catch (err) {
           alertBox.className = 'alert-box error';
@@ -302,6 +313,18 @@ double[] ARRAY_LEMBUR = { 0.30, 0.32, 0.34, 0.36, 0.38 };
           submitBtn.textContent = 'Hitung';
         }
       });
+
+      if (btnHandover) {
+        btnHandover.style.display = 'flex';
+        btnHandover.addEventListener('click', () => {
+          if (!lastCalculationData || !window.Payroll3D) return;
+          btnHandover.disabled = true;
+          btnHandover.textContent = 'Karyawan sedang mengambil gaji...';
+          window.Payroll3D.handoverSalary(lastCalculationData, () => {
+            btnHandover.textContent = 'Gaji Telah Diterima ✓';
+          });
+        });
+      }
 
       document.getElementById('btn-fast-sit').addEventListener('click', () => {
         if (window.Payroll3D) window.Payroll3D.sitDown();

@@ -504,6 +504,32 @@ kbd {
   cursor: not-allowed;
 }
 
+.btn-handover {
+  width: 100%;
+  padding: 10px 16px;
+  background: var(--accent-emerald);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+  margin-top: 8px;
+}
+
+.btn-handover:hover {
+  background: #059669;
+}
+
+.btn-handover:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 /* Alert Box */
 .alert-box {
   padding: 8px 12px;
