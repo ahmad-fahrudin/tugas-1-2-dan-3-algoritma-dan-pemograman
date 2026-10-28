@@ -54,6 +54,8 @@ import {
   let povMode = 'FPS'; // 'FPS' | 'THIRD_PERSON'
   let cameraYaw = Math.PI; // Face desk at start
   let cameraPitch = -0.06;
+  let targetCameraYaw = Math.PI;
+  let targetCameraPitch = -0.06;
   let isPointerLocked = false;
   let isDraggingCanvas = false;
   let previousMousePos = { x: 0, y: 0 };
@@ -107,12 +109,17 @@ import {
     camera = new THREE.PerspectiveCamera(65, aspect, 0.1, 100);
     camera.position.set(player.pos.x, player.pos.y + 1.62, player.pos.z);
 
-    // 3. Renderer
-    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    // 3. Renderer (High Performance, Stencil disabled, Capped DPR, PCF Shadow)
+    renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      powerPreference: 'high-performance',
+      stencil: false,
+      depth: true
+    });
     renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.18;
     container.appendChild(renderer.domElement);
@@ -151,7 +158,7 @@ import {
   }
 
   function setupLighting() {
-    const ambient = new THREE.AmbientLight(0xecf0f5, 1.0);
+    const ambient = new THREE.AmbientLight(0xecf0f5, 1.05);
     scene.add(ambient);
 
     const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.25);
@@ -159,18 +166,29 @@ import {
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.width = 1024;
     sunLight.shadow.mapSize.height = 1024;
-    sunLight.shadow.bias = -0.0005;
+    sunLight.shadow.camera.near = 0.5;
+    sunLight.shadow.camera.far = 24;
+    sunLight.shadow.camera.left = -7.5;
+    sunLight.shadow.camera.right = 7.5;
+    sunLight.shadow.camera.top = 7.5;
+    sunLight.shadow.camera.bottom = -7.5;
+    sunLight.shadow.bias = -0.0004;
     scene.add(sunLight);
 
-    const ceilingLight = new THREE.PointLight(0xf8fafc, 1.4, 18);
+    // Ceiling Light: High ambient luminescence without costly 6-face shadow map render pass
+    const ceilingLight = new THREE.PointLight(0xf8fafc, 1.3, 18, 1.8);
     ceilingLight.position.set(0, 4.2, 0);
-    ceilingLight.castShadow = true;
+    ceilingLight.castShadow = false;
     scene.add(ceilingLight);
 
+    // Desk SpotLight: Focused shadow for table interaction
     const deskSpot = new THREE.SpotLight(0xfef3c7, 1.8, 10, Math.PI / 3.4, 0.4, 1);
     deskSpot.position.set(-1.8, 2.6, 0.8);
     deskSpot.target.position.set(0, 1.15, 0.3);
     deskSpot.castShadow = true;
+    deskSpot.shadow.mapSize.width = 512;
+    deskSpot.shadow.mapSize.height = 512;
+    deskSpot.shadow.bias = -0.0005;
     scene.add(deskSpot);
     scene.add(deskSpot.target);
 
@@ -182,6 +200,7 @@ import {
   function clampPitch() {
     const maxPitch = player.isSitting ? Math.PI / 3.0 : Math.PI / 2.3;
     const minPitch = player.isSitting ? -Math.PI / 2.8 : -Math.PI / 2.3;
+    targetCameraPitch = Math.max(minPitch, Math.min(maxPitch, targetCameraPitch));
     cameraPitch = Math.max(minPitch, Math.min(maxPitch, cameraPitch));
   }
 
@@ -225,18 +244,18 @@ import {
       if (npc.state !== 'IDLE') return;
 
       if (isPointerLocked) {
-        const sensitivity = 0.0024;
-        cameraYaw -= e.movementX * sensitivity;
-        cameraPitch -= e.movementY * sensitivity;
+        const sensitivity = 0.0022;
+        targetCameraYaw -= e.movementX * sensitivity;
+        targetCameraPitch -= e.movementY * sensitivity;
         clampPitch();
       } else if (isDraggingCanvas) {
         const deltaX = e.clientX - previousMousePos.x;
         const deltaY = e.clientY - previousMousePos.y;
         previousMousePos = { x: e.clientX, y: e.clientY };
 
-        const sensitivity = 0.004;
-        cameraYaw -= deltaX * sensitivity;
-        cameraPitch -= deltaY * sensitivity;
+        const sensitivity = 0.0035;
+        targetCameraYaw -= deltaX * sensitivity;
+        targetCameraPitch -= deltaY * sensitivity;
         clampPitch();
       }
     });
@@ -357,8 +376,8 @@ import {
       player.rightArm.rotation.x = -0.55;
     }
 
-    cameraYaw = Math.PI;
-    cameraPitch = -0.15;
+    targetCameraYaw = cameraYaw = Math.PI;
+    targetCameraPitch = cameraPitch = -0.15;
 
     SoundFX.sit();
 
@@ -393,8 +412,8 @@ import {
       player.rightArm.rotation.x = 0;
     }
 
-    cameraYaw = Math.PI;
-    cameraPitch = -0.06;
+    targetCameraYaw = cameraYaw = Math.PI;
+    targetCameraPitch = cameraPitch = -0.06;
 
     SoundFX.stand();
 
@@ -405,24 +424,40 @@ import {
     if (terminalDrawer) terminalDrawer.classList.remove('open');
   }
 
-  function updateCamera() {
+  // Reusable Scratch Vectors (Zero Garbage-Collection Overhead)
+  const _lookDir = new THREE.Vector3();
+  const _camTarget = new THREE.Vector3();
+  const _baseEyePos = new THREE.Vector3();
+  const _targetCamPos = new THREE.Vector3();
+  const _npcHead = new THREE.Vector3();
+  const _dir = new THREE.Vector3();
+  const _chairLookTarget = new THREE.Vector3(chairPos.x, 1.35, chairPos.z - 0.5);
+  const _playerLookTarget = new THREE.Vector3();
+
+  function updateCamera(delta) {
+    // 1. Smooth rotation damping towards target yaw/pitch (Fluid & buttery smooth)
+    const rotDamp = 1.0 - Math.exp(-28 * delta);
+    cameraYaw = THREE.MathUtils.lerp(cameraYaw, targetCameraYaw, rotDamp);
+    cameraPitch = THREE.MathUtils.lerp(cameraPitch, targetCameraPitch, rotDamp);
+
     if (player.isSitting) {
       if (npc.state !== 'IDLE' && npc.meshGroup && npc.meshGroup.visible) {
-        const npcHead = new THREE.Vector3(npc.pos.x, 1.35, npc.pos.z);
+        _npcHead.set(npc.pos.x, 1.35, npc.pos.z);
         camera.position.set(chairPos.x, 1.78, chairPos.z - 0.15);
-        camera.lookAt(npcHead);
+        camera.lookAt(_npcHead);
 
-        const dir = npcHead.clone().sub(camera.position).normalize();
-        cameraYaw = Math.atan2(dir.x, dir.z);
-        cameraPitch = Math.asin(dir.y);
+        _dir.copy(_npcHead).sub(camera.position).normalize();
+        targetCameraYaw = cameraYaw = Math.atan2(_dir.x, _dir.z);
+        targetCameraPitch = cameraPitch = Math.asin(_dir.y);
 
         if (player.meshGroup) player.meshGroup.visible = false;
         return;
       }
 
-      seatedZoom = THREE.MathUtils.lerp(seatedZoom, targetSeatedZoom, 0.15);
+      const zoomDamp = 1.0 - Math.exp(-15 * delta);
+      seatedZoom = THREE.MathUtils.lerp(seatedZoom, targetSeatedZoom, zoomDamp);
 
-      const lookDir = new THREE.Vector3(
+      _lookDir.set(
         Math.sin(cameraYaw) * Math.cos(cameraPitch),
         Math.sin(cameraPitch),
         Math.cos(cameraYaw) * Math.cos(cameraPitch)
@@ -433,9 +468,10 @@ import {
         camera.updateProjectionMatrix();
 
         const forwardDolly = seatedZoom * 0.45;
-        const baseEyePos = new THREE.Vector3(chairPos.x, 1.78, chairPos.z - 0.15);
-        camera.position.copy(baseEyePos).addScaledVector(lookDir, forwardDolly);
-        camera.lookAt(camera.position.clone().add(lookDir));
+        _baseEyePos.set(chairPos.x, 1.78, chairPos.z - 0.15);
+        camera.position.copy(_baseEyePos).addScaledVector(_lookDir, forwardDolly);
+        _camTarget.copy(camera.position).add(_lookDir);
+        camera.lookAt(_camTarget);
 
         if (player.meshGroup) {
           player.meshGroup.visible = false;
@@ -449,14 +485,15 @@ import {
         camera.updateProjectionMatrix();
 
         const camDist = THREE.MathUtils.lerp(2.4, 1.3, seatedZoom);
-        const targetCamPos = new THREE.Vector3(
+        _targetCamPos.set(
           chairPos.x - Math.sin(cameraYaw) * camDist,
           THREE.MathUtils.lerp(2.05, 1.6, seatedZoom) - Math.sin(cameraPitch) * 1.2,
           (chairPos.z + 0.4) - Math.cos(cameraYaw) * camDist
         );
 
-        camera.position.lerp(targetCamPos, 0.18);
-        camera.lookAt(new THREE.Vector3(chairPos.x, 1.35, chairPos.z - 0.5));
+        const followDamp = 1.0 - Math.exp(-18 * delta);
+        camera.position.lerp(_targetCamPos, followDamp);
+        camera.lookAt(_chairLookTarget);
       }
       return;
     }
@@ -466,16 +503,16 @@ import {
       camera.updateProjectionMatrix();
     }
 
+    _lookDir.set(
+      Math.sin(cameraYaw) * Math.cos(cameraPitch),
+      Math.sin(cameraPitch),
+      Math.cos(cameraYaw) * Math.cos(cameraPitch)
+    );
+
     if (povMode === 'FPS') {
       camera.position.set(player.pos.x, player.pos.y + 1.62, player.pos.z);
-
-      const lookDir = new THREE.Vector3(
-        Math.sin(cameraYaw) * Math.cos(cameraPitch),
-        Math.sin(cameraPitch),
-        Math.cos(cameraYaw) * Math.cos(cameraPitch)
-      );
-
-      camera.lookAt(camera.position.clone().add(lookDir));
+      _camTarget.copy(camera.position).add(_lookDir);
+      camera.lookAt(_camTarget);
 
       if (player.meshGroup) {
         player.meshGroup.visible = false;
@@ -487,14 +524,16 @@ import {
 
       const camDist = 3.4;
       const camHeight = 1.6;
-      const targetCamPos = new THREE.Vector3(
+      _targetCamPos.set(
         player.pos.x - Math.sin(cameraYaw) * camDist,
         player.pos.y + camHeight - Math.sin(cameraPitch) * 1.5,
         player.pos.z - Math.cos(cameraYaw) * camDist
       );
 
-      camera.position.lerp(targetCamPos, 0.15);
-      camera.lookAt(new THREE.Vector3(player.pos.x, player.pos.y + 1.2, player.pos.z));
+      const followDamp = 1.0 - Math.exp(-18 * delta);
+      camera.position.lerp(_targetCamPos, followDamp);
+      _playerLookTarget.set(player.pos.x, player.pos.y + 1.2, player.pos.z);
+      camera.lookAt(_playerLookTarget);
     }
   }
 
@@ -505,13 +544,36 @@ import {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  }
+
+  // Realtime FPS Benchmark Counter
+  let frameCount = 0;
+  let lastFpsTime = performance.now();
+  let fpsCounterEl = null;
+
+  function updateFps() {
+    frameCount++;
+    const now = performance.now();
+    const elapsed = now - lastFpsTime;
+    if (elapsed >= 350) {
+      const fps = Math.round((frameCount * 1000) / elapsed);
+      if (!fpsCounterEl) fpsCounterEl = document.getElementById('fps-counter');
+      if (fpsCounterEl) {
+        fpsCounterEl.textContent = `${fps} FPS`;
+      }
+      frameCount = 0;
+      lastFpsTime = now;
+    }
   }
 
   function animate() {
     requestAnimationFrame(animate);
 
-    const delta = clock.getDelta();
+    const delta = Math.min(clock.getDelta(), 0.08);
     const time = clock.getElapsedTime();
+
+    updateFps();
 
     if (hologramMeshObj) {
       hologramMeshObj.position.y = 2.15 + Math.sin(time * 2.2) * 0.05;
@@ -519,7 +581,7 @@ import {
     }
 
     updatePlayerPhysics(THREE, delta, keys, cameraYaw, colliders, chairPos, CHAIR_INTERACTION_DIST);
-    updateCamera();
+    updateCamera(delta);
     updateNpc(THREE, delta, camera);
 
     updateCoinParticles(scene, delta);
@@ -561,8 +623,14 @@ import {
     handoverSalary(data, onComplete) {
       handoverSalary(data, onComplete, {
         get isSitting() { return player.isSitting; },
-        set cameraYaw(val) { cameraYaw = val; },
-        set cameraPitch(val) { cameraPitch = val; }
+        set cameraYaw(val) {
+          targetCameraYaw = val;
+          cameraYaw = val;
+        },
+        set cameraPitch(val) {
+          targetCameraPitch = val;
+          cameraPitch = val;
+        }
       });
     },
     toggleMute() {

@@ -49,7 +49,6 @@ export function buildWorkstationDesk(THREE, scene) {
   ].forEach(pos => {
     const leg = new THREE.Mesh(legGeo, legMat);
     leg.position.set(...pos);
-    leg.castShadow = true;
     deskGroup.add(leg);
 
     const glide = new THREE.Mesh(

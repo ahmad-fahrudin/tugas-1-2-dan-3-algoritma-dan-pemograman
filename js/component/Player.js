@@ -181,38 +181,56 @@ export function buildRobloxPlayer(THREE, scene) {
   scene.add(pGroup);
 }
 
+let _forward = null;
+let _right = null;
+let _moveDir = null;
+let _targetPos = null;
+let _up = null;
+
+function ensureScratchVectors(THREE) {
+  if (!_forward) {
+    _forward = new THREE.Vector3();
+    _right = new THREE.Vector3();
+    _moveDir = new THREE.Vector3();
+    _targetPos = new THREE.Vector3();
+    _up = new THREE.Vector3(0, 1, 0);
+  }
+}
+
 export function updatePlayerPhysics(THREE, delta, keys, cameraYaw, colliders, chairPos, CHAIR_INTERACTION_DIST) {
   if (player.isSitting) return;
 
+  ensureScratchVectors(THREE);
+
   const fx = Math.sin(cameraYaw);
   const fz = Math.cos(cameraYaw);
-  const forward = new THREE.Vector3(fx, 0, fz).normalize();
-  const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
+  _forward.set(fx, 0, fz).normalize();
+  _right.crossVectors(_forward, _up).normalize();
 
-  const moveDir = new THREE.Vector3();
-  if (keys.forward)  moveDir.add(forward);
-  if (keys.backward) moveDir.sub(forward);
-  if (keys.right)    moveDir.add(right);
-  if (keys.left)     moveDir.sub(right);
+  _moveDir.set(0, 0, 0);
+  if (keys.forward)  _moveDir.add(_forward);
+  if (keys.backward) _moveDir.sub(_forward);
+  if (keys.right)    _moveDir.add(_right);
+  if (keys.left)     _moveDir.sub(_right);
 
-  const isMoving = moveDir.lengthSq() > 0.0001;
+  const isMoving = _moveDir.lengthSq() > 0.0001;
   const currentSpeed = keys.sprint ? player.sprintSpeed : player.speed;
 
   if (isMoving) {
-    moveDir.normalize();
+    _moveDir.normalize();
     const moveDist = currentSpeed * delta;
-    const targetPos = player.pos.clone().addScaledVector(moveDir, moveDist);
+    _targetPos.copy(player.pos).addScaledVector(_moveDir, moveDist);
 
-    targetPos.x = Math.max(-6.5, Math.min(6.5, targetPos.x));
-    targetPos.z = Math.max(-6.5, Math.min(6.5, targetPos.z));
+    _targetPos.x = Math.max(-6.5, Math.min(6.5, _targetPos.x));
+    _targetPos.z = Math.max(-6.5, Math.min(6.5, _targetPos.z));
 
     let canMove = true;
     for (const col of colliders) {
       if (
-        targetPos.x > col.minX &&
-        targetPos.x < col.maxX &&
-        targetPos.z > col.minZ &&
-        targetPos.z < col.maxZ
+        _targetPos.x > col.minX &&
+        _targetPos.x < col.maxX &&
+        _targetPos.z > col.minZ &&
+        _targetPos.z < col.maxZ
       ) {
         canMove = false;
         break;
@@ -220,7 +238,7 @@ export function updatePlayerPhysics(THREE, delta, keys, cameraYaw, colliders, ch
     }
 
     if (canMove) {
-      player.pos.copy(targetPos);
+      player.pos.copy(_targetPos);
     }
 
     SoundFX.step();
@@ -235,15 +253,17 @@ export function updatePlayerPhysics(THREE, delta, keys, cameraYaw, colliders, ch
     }
 
     if (player.meshGroup) {
-      const lookAngle = Math.atan2(moveDir.x, moveDir.z);
-      player.meshGroup.rotation.y = THREE.MathUtils.lerp(player.meshGroup.rotation.y, lookAngle, 0.2);
+      const lookAngle = Math.atan2(_moveDir.x, _moveDir.z);
+      const rotDamp = 1.0 - Math.exp(-18 * delta);
+      player.meshGroup.rotation.y = THREE.MathUtils.lerp(player.meshGroup.rotation.y, lookAngle, rotDamp);
     }
   } else {
     if (player.leftArm && player.rightArm && player.leftLeg && player.rightLeg) {
-      player.leftArm.rotation.x = THREE.MathUtils.lerp(player.leftArm.rotation.x, 0, 0.15);
-      player.rightArm.rotation.x = THREE.MathUtils.lerp(player.rightArm.rotation.x, 0, 0.15);
-      player.leftLeg.rotation.x = THREE.MathUtils.lerp(player.leftLeg.rotation.x, 0, 0.15);
-      player.rightLeg.rotation.x = THREE.MathUtils.lerp(player.rightLeg.rotation.x, 0, 0.15);
+      const limbDamp = 1.0 - Math.exp(-14 * delta);
+      player.leftArm.rotation.x = THREE.MathUtils.lerp(player.leftArm.rotation.x, 0, limbDamp);
+      player.rightArm.rotation.x = THREE.MathUtils.lerp(player.rightArm.rotation.x, 0, limbDamp);
+      player.leftLeg.rotation.x = THREE.MathUtils.lerp(player.leftLeg.rotation.x, 0, limbDamp);
+      player.rightLeg.rotation.x = THREE.MathUtils.lerp(player.rightLeg.rotation.x, 0, limbDamp);
     }
   }
 

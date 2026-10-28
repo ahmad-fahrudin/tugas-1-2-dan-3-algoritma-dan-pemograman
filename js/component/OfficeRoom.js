@@ -72,7 +72,6 @@ export function buildOfficeRoom(THREE, scene) {
   for (let x = -3.2; x <= 3.2; x += 0.32) {
     const slat = new THREE.Mesh(slatGeo, slatMat);
     slat.position.set(x, 2.25, -6.94);
-    slat.castShadow = true;
     roomGroup.add(slat);
   }
 
@@ -143,7 +142,6 @@ export function buildOfficeRoom(THREE, scene) {
   const potMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6 });
   const plantPot = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.24, 0.65, 20), potMat);
   plantPot.position.set(-5.8, 0.325, 5.5);
-  plantPot.castShadow = true;
   roomGroup.add(plantPot);
 
   const leafMat = new THREE.MeshStandardMaterial({ color: 0x059669, roughness: 0.4 });
@@ -167,7 +165,6 @@ export function buildOfficeRoom(THREE, scene) {
     new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.3 })
   );
   wdBase.position.set(5.5, 0.675, -6.3);
-  wdBase.castShadow = true;
   roomGroup.add(wdBase);
 
   const bottle = new THREE.Mesh(

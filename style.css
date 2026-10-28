@@ -146,6 +146,37 @@ body {
   gap: 8px;
 }
 
+.fps-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  color: #38bdf8;
+  padding: 5px 11px;
+  border-radius: var(--radius);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  user-select: none;
+  backdrop-filter: blur(8px);
+}
+
+.fps-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulseFps 2s infinite ease-in-out;
+}
+
+@keyframes pulseFps {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
 .btn-quiet {
   background: var(--bg-panel);
   border: 1px solid var(--border);
